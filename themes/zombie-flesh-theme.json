@@ -1,0 +1,17 @@
+{
+  "bg": "#2B2D2B",
+  "fg": "#E0E0E0",
+  "muted": "#7A7A7A",
+  "accent": "#69F0AE",
+  "danger": "#FF9800",
+  "sel-bg": "#3C3F3C",
+  "btn-border": "#5A5D5A",
+  "border": "#444744",
+  "input-bg": "#3C3F3C",
+  "input-fg": "#E0E0E0",
+  "btn-bg": "#3C3F3C",
+  "btn-fg": "#E0E0E0",
+  "dim": "#7A7A7A",
+  "border-radius": "4px",
+  "pill-radius": "4px"
+}

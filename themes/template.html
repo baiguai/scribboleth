@@ -1,0 +1,136 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Httree Theme Previews</title>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+                background-color: #f0f2f5;
+                color: #333;
+                margin: 0;
+                padding: 20px;
+            }
+            h1 {
+                text-align: center;
+                color: #111;
+            }
+            .grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+                gap: 25px;
+            }
+            .theme-preview-container {
+                border: 1px solid #d0d7de;
+                border-radius: 8px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+                transition: box-shadow 0.2s ease-in-out;
+            }
+            .theme-preview-container:hover {
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            }
+            .theme-preview-container h3 {
+                margin: 0;
+                padding: 12px 16px;
+                border-bottom: 1px solid #d0d7de;
+                font-size: 1em;
+                font-weight: 600;
+                background-color: #f6f8fa;
+                border-top-left-radius: 8px;
+                border-top-right-radius: 8px;
+            }
+            .theme-preview {
+                height: 320px;
+                overflow: hidden;
+                font-size: 13px;
+                line-height: 1.4;
+                border-bottom-left-radius: 8px;
+                border-bottom-right-radius: 8px;
+            }
+            .preview-content {
+                background: var(--bg);
+                color: var(--fg);
+                font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            }
+            .preview-content .app {
+                display: grid;
+                grid-template-columns: 130px 1fr;
+                grid-template-rows: auto 1fr;
+                grid-template-areas:
+                "header header"
+                "tree editor";
+                width: 100%;
+                height: 320px;
+            }
+            .preview-content header {
+                grid-area: header;
+                padding: 5px 8px;
+                border-bottom: 1px solid var(--border);
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+            .preview-content header .dot { width: 10px; height: 10px; border-radius: 50%; }
+            .preview-content .dot.green { background: var(--accent); }
+            .preview-content .dot.red { background: var(--danger); }
+            .preview-content .kbd-hint { color: var(--muted); }
+            .preview-content .tree {
+                grid-area: tree;
+                border-right: 1px solid var(--border);
+                overflow: hidden;
+                padding: 8px 4px;
+            }
+            .preview-content .tree ul { list-style: none; margin: 0; padding-left: 12px; }
+            .preview-content .tree li { margin: 2px 0; }
+            .preview-content .node {
+                display: flex; align-items: center; gap: 5px;
+                padding: 2px 6px; border-radius: 4px;
+                cursor: default; user-select: none;
+            }
+            .preview-content .node .twisty { color: var(--muted); }
+            .preview-content .node .icon { color: var(--muted); }
+            .preview-content .node .title { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .preview-content .node.selected { background: var(--sel-bg); }
+            .preview-content .editor {
+                grid-area: editor;
+                display: grid;
+                grid-template-rows: auto 1fr;
+                min-width: 0;
+            }
+            .preview-content .status {
+                padding: 4px 8px;
+                border-bottom: 1px solid var(--border);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                white-space: nowrap;
+            }
+            .preview-content .pill {
+                padding: 2px 6px;
+                border: 1px solid var(--btn-border, var(--border));
+                border-radius: var(--pill-radius);
+                color: var(--muted);
+                font-size: 0.9em;
+            }
+            .preview-content .dim { color: var(--muted); flex-shrink: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis;}
+            .preview-content .textarea-mock {
+                background: transparent;
+                color: var(--fg);
+                border: none;
+                outline: none;
+                resize: none;
+                padding: 8px 10px;
+                font: inherit;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Httree Theme Previews</h1>
+        <div class="grid">
+            {previews_html}
+        </div>
+    </body>
+    </html>
+    

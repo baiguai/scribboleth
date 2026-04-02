@@ -1,0 +1,19 @@
+{
+  "bg": "#282c34",
+  "fg": "#abb2bf",
+  "muted": "#5c6370",
+  "accent": "#61afef",
+  "danger": "#e06c75",
+  "sel-bg": "#3e4451",
+  "btn-border": "#5c6370",
+  "border": "#434a56",
+  "input-bg": "#3e4451",
+  "input-fg": "#abb2bf",
+  "btn-bg": "#3e4451",
+  "btn-fg": "#abb2bf",
+  "dim": "#5c6370",
+  "border-radius": "0px",
+  "pill-radius": "0px",
+  "vim-cursor": "#8b919e",
+  "insert-cursor": "#61afef"
+}
