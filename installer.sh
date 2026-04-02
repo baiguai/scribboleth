@@ -111,7 +111,7 @@ fi
 echo "New scribboleth instance '$FILENAME' created in '$TARGET_DIR' on port $PORT."
 echo "To start the node service, run: $SCRNODES_SH"
 
+cp ./package.json "$TARGET_DIR"
 cd "$TARGET_DIR"
-cp ../package.json .
 npm install
 
