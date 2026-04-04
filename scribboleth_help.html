@@ -663,17 +663,17 @@
 
 <div class="search-dialog" id="searchDialog" style="display: none;">
     <input id="searchInput" placeholder="Search..." type="text">
-    <div class="search-results" id="searchList"><div class="selected">Other Options</div></div>
+    <div class="search-results" id="searchList"><div style="color: var(--dim);">(no matching nodes)</div></div>
 </div>
 
 <div class="search-dialog" id="linkSearchDialog" style="display: none;">
     <input id="linkSearchInput" placeholder="Search to insert link..." type="text">
-    <div class="search-results" id="linkSearchList"></div>
+    <div class="search-results" id="linkSearchList"><div class="selected">Introduction to Advanced Saving</div></div>
 </div>
 
-<div class="search-dialog" id="helpDialogUnified" style="display:none;">
+<div class="search-dialog" id="helpDialogUnified" style="display: none;">
   <input id="helpFilter" type="text" placeholder="Filter help (Start with : to search keys only)...">
-  <div id="helpResults" class="search-results"></div>
+  <div id="helpResults" class="search-results"><div><b>#</b> <span class="dim">(TREE) - </span>Show note links dialog</div><div><b>X</b> <span class="dim">(TREE) - </span>Show broken note links</div><div><b>Control+'</b> <span class="dim">(INSERT) - </span>Insert Link</div></div>
   <p><a href="https://hcjsuite.infinityfreeapp.com/scribboleth_help.html" target="_blank">Full Help System</a></p>
   <p style="margin-top:6px;">Press ESC to close.</p>
 </div>
@@ -742,7 +742,7 @@
         <span class="dim" id="path">/</span>
         <span class="pill" id="msg"></span>
     </div>
-    <textarea id="editorArea" spellcheck="false" readonly="readonly" class=""></textarea>
+    <textarea id="editorArea" spellcheck="false" class="" readonly="readonly"></textarea>
 </section>
 </div>
 
@@ -1315,6 +1315,13 @@
                 "expanded": false
               },
               {
+                "id": "hd35ryai",
+                "title": "Using the Uninstaller Script",
+                "content": "Using the Uninstaller Script\n\n\nYou can manually remove a Scribboleth file by simply deleting it.\nHowever if that file utilizes a Node Saver (see _Introduction to Advanced Saving_)\nremoving it is more involved:\n\n* Delete the .html file.\n* Delete the svr_* file.\n* Remove its entries in the scrnodes.* script.\n\nTo make this process easier, there is the uninstaller.sh or uninstaller.bat.\n\nTo utilize these scripts you would simply call the following in a console\nor command window:\n\nuninstaller.sh <<full path to the .html>>\nuninstaller.bat <<full path to the .html>>",
+                "children": [],
+                "expanded": false
+              },
+              {
                 "id": "dbkr480d",
                 "title": "Manually Install",
                 "content": "",
@@ -1512,14 +1519,6 @@
         "title": "Introduction to Saving"
     },
     {
-        "id": "bdc6h40i",
-        "title": "Introduction to Advanced Saving"
-    },
-    {
-        "id": "ku2n5fi2",
-        "title": "Benefits of Advanced Saving"
-    },
-    {
         "id": "5d37h8fj",
         "title": "Copy the Files"
     },
@@ -1532,10 +1531,6 @@
         "title": "Configure Your Notes File"
     },
     {
-        "id": "w4p132r1",
-        "title": "Install Node and NPM"
-    },
-    {
         "id": "8tu8ax56",
         "title": "Using the Links Dialog"
     },
@@ -1546,10 +1541,6 @@
     {
         "id": "z6ijgy5i",
         "title": "Easily Add Reference Links"
-    },
-    {
-        "id": "uirc0zcu",
-        "title": "Using the Installer Script"
     },
     {
         "id": "3k7huuk6",
@@ -1566,6 +1557,26 @@
     {
         "id": "e1ehbevm",
         "title": "Tables"
+    },
+    {
+        "id": "bdc6h40i",
+        "title": "Introduction to Advanced Saving"
+    },
+    {
+        "id": "ku2n5fi2",
+        "title": "Benefits of Advanced Saving"
+    },
+    {
+        "id": "w4p132r1",
+        "title": "Install Node and NPM"
+    },
+    {
+        "id": "uirc0zcu",
+        "title": "Using the Installer Script"
+    },
+    {
+        "id": "hd35ryai",
+        "title": "Using the Uninstaller Script"
     },
     {
         "id": "7tvrov2y",
