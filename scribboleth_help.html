@@ -1574,7 +1574,7 @@
 ];
 
         // !@!
-        const readOnly = false;
+        const readOnly = true;
 
         const SAFE_MAP = {
             "</script": "^^^script^^^",
@@ -3851,8 +3851,10 @@
             // Scroll and select
             area.setSelectionRange(match.index, match.index + match.length);
             setVimMode(false);
-            editing = true;
-            // Don't focus the editor - keep focus on the search input
+            editing = false;
+            if (!readOnly) {
+                editing = true;
+            }
         }
         function navigateFindResults(dir) {
             if (findMatches.length === 0) return;
@@ -4316,17 +4318,20 @@
                     closeSearch();
                     const selInfo = findNodeAndParentById(selectedId);
                     if (selInfo && !isFolder(selInfo.node)) {
-                        editing = true;
-                        mode_insert = false;
-                        mode_visual = true;
-                        render();
-                        setTimeout(() => {
-                            editorArea.focus();
-                            // Force re-style
-                            editorArea.classList.remove('normal-mode');
-                            void editorArea.offsetWidth; // force reflow
-                            editorArea.classList.add('visual-mode');
-                        }, 0);
+                        if (!readOnly) {
+                            editing = true;
+                            mode_insert = false;
+                            mode_visual = true;
+
+                            render();
+                            setTimeout(() => {
+                                editorArea.focus();
+                                // Force re-style
+                                editorArea.classList.remove('normal-mode');
+                                void editorArea.offsetWidth; // force reflow
+                                editorArea.classList.add('visual-mode');
+                            }, 0);
+                        }
                     }
                 }
             } else if (e.key === 'Escape') {
