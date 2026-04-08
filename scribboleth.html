@@ -3508,7 +3508,7 @@
                     const lineEnd = lineEndPos === -1 ? text.length : lineEndPos + 1;
                     return text.substring(lineStart, lineEnd);
                 } else {
-                    if (end < editorArea.value.length) end += 1;
+                    if (end < editorArea.value.length) end;
                     return editorArea.value.substring(start, end);
                 }
             }
