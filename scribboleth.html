@@ -3046,6 +3046,10 @@
                 optionIndex = 0;
                 optionFields[optionIndex].focus();
             }
+            function closeOptions() {
+                closeOptionsDialog();
+            }
+
             function closeOptionsDialog() {
                 optionsDialog.style.display = 'none';
             }
@@ -3257,6 +3261,8 @@ function renderThemeList() {
                 closeThemePickerDialog();
             }
 
+            let saveAsKeyHandler = null;
+
             function openSaveAsDialog(defaultTitle = document.title, defaultFile = fileName) {
                 const titleInput = document.getElementById('saveAsTitle');
                 const fileInput = document.getElementById('saveAsFileName');
@@ -3268,28 +3274,32 @@ function renderThemeList() {
                 titleInput.focus();
                 titleInput.select();
 
-                function closeDialog() {
-                    saveAsDialog.style.display = 'none';
-                    document.removeEventListener('keydown', keyHandler);
-                }
-
-                function keyHandler(e) {
+                const keyHandler = function(e) {
                     if (e.key === 'Enter') {
                         e.preventDefault();
                         const newTitle = titleInput.value.trim() || 'Untitled';
                         const newFile = fileInput.value.trim() || 'untitled';
                         fileName = newFile;
                         document.title = newTitle;
-                        closeDialog();
+                        closeSaveAs();
                         saveAsHtml(newFile);
-                        importedFileName = null; // Reset after saving
+                        importedFileName = null;
                     } else if (e.key === 'Escape') {
                         e.preventDefault();
-                        closeDialog();
+                        closeSaveAs();
                     }
-                }
+                };
 
+                saveAsKeyHandler = keyHandler;
                 document.addEventListener('keydown', keyHandler);
+            }
+
+            function closeSaveAs() {
+                saveAsDialog.style.display = 'none';
+                if (saveAsKeyHandler) {
+                    document.removeEventListener('keydown', saveAsKeyHandler);
+                    saveAsKeyHandler = null;
+                }
             }
             
             function closeHistoryDialog() {
@@ -3393,6 +3403,10 @@ function renderThemeList() {
                 }
 
                 document.getElementById('searchText').focus();
+            }
+
+            function closeReplace() {
+                closeReplaceDialog();
             }
 
             function closeReplaceDialog() {
@@ -4164,10 +4178,14 @@ function renderThemeList() {
                 };
                 }
 
-                function closeHelpDialog() {
-                    showingHelp = false;
-                    document.getElementById('helpDialogUnified').style.display = 'none';
-                }
+            function closeHelp() {
+                closeHelpDialog();
+            }
+
+            function closeHelpDialog() {
+                showingHelp = false;
+                document.getElementById('helpDialogUnified').style.display = 'none';
+            }
 
 
 
