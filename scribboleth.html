@@ -491,17 +491,6 @@
                     font-family: monospace;
                     box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
                 }
-                .replace-dialog-in-tree {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    border-radius: 0;
-                    border: none;
-                    box-shadow: none;
-                    z-index: 1001; /* Higher than tree, lower than other dialogs */
-                }
                 #replaceDialog h3 {
                     margin-top: 0;
                 }
@@ -3375,17 +3364,12 @@ function renderThemeList() {
 
                 if (modeEl.textContent === 'TREE') {
                     const treeRect = treeEl.getBoundingClientRect();
-                    treeEl.style.display = 'none';
-
-                    replaceDialog.style.position = 'absolute';
                     replaceDialog.style.top = `${treeRect.top}px`;
                     replaceDialog.style.left = `${treeRect.left}px`;
                     replaceDialog.style.width = `${treeRect.width}px`;
                     replaceDialog.style.height = `${treeRect.height}px`;
-                    replaceDialog.classList.add('replace-dialog-in-tree');
-                    document.body.appendChild(replaceDialog);
                 }
-                
+
                 replaceDialog.style.display = 'block';
 
                 if (readOnly) {
@@ -3412,19 +3396,11 @@ function renderThemeList() {
 
             function closeReplaceDialog() {
                 const replaceDialog = document.getElementById('replaceDialog');
-                const treeEl = document.getElementById('tree');
-                
-                if (replaceDialog.classList.contains('replace-dialog-in-tree')) {
-                    treeEl.style.display = 'block';
-                    replaceDialog.classList.remove('replace-dialog-in-tree');
-                    replaceDialog.style.position = '';
-                    replaceDialog.style.top = '';
-                    replaceDialog.style.left = '';
-                    replaceDialog.style.width = '';
-                    replaceDialog.style.height = '';
-                }
-
                 replaceDialog.style.display = 'none';
+                replaceDialog.style.top = '15%';
+                replaceDialog.style.left = '5px';
+                replaceDialog.style.width = '230px';
+                replaceDialog.style.height = '';
                 finding = false;
             }
 
@@ -3561,15 +3537,16 @@ function renderThemeList() {
 
             const searchInputEl = document.getElementById('searchText');
             const replaceInputEl = document.getElementById('replaceText');
-
-            replaceInputEl.addEventListener('keydown', e => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    doReplaceAll(); // replaces all
-                    closeReplaceDialog();
-                }
-            });
+            if (replaceInputEl) {
+                replaceInputEl.addEventListener('keydown', e => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        doReplaceAll(); // replaces all
+                        closeReplaceDialog();
+                    }
+                });
+            }
 
         //---- Copy / Paste ----------------------------------------------------
             function copyNode() {
