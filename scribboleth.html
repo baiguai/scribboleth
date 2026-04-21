@@ -1848,7 +1848,9 @@
                     }
                     
                     editorArea.selectionStart = editorArea.selectionEnd = newCursorPos;
-                
+
+                    mode_deleting = false;
+               
                     syncFile();
                     performed = true;
                 } else {
