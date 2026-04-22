@@ -3660,6 +3660,8 @@
                 ctx.siblings.splice(ctx.index, 1);
                 selectedId = goTo ? (goTo.id || goTo) : null;
             }
+            let savedTreeWidth = 320;
+            let treePanelVisible = true;
             function resizeTree(adjustment){
                 const app = document.querySelector('.app');
                 if (!app) return;
@@ -3678,10 +3680,11 @@
                     treeWidth = 240;
                 }
 
+                savedTreeWidth = treeWidth;
+
                 // Update the grid-template-columns
                 app.style.gridTemplateColumns = `${treeWidth}px 1fr`;
             }
-            let treePanelVisible = true;
             function toggleTreePanel(){
                 const treeEl = document.getElementById('tree');
                 const app = document.querySelector('.app');
@@ -3701,7 +3704,7 @@
                 } else {
                     treePanelVisible = !treePanelVisible;
                     if (treePanelVisible) {
-                        app.style.gridTemplateColumns = `320px 1fr`;
+                        app.style.gridTemplateColumns = `${savedTreeWidth}px 1fr`;
                         treeEl.style.display = '';
                     } else {
                         app.style.gridTemplateColumns = `0px 1fr`;
