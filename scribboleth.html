@@ -788,7 +788,7 @@
             let importedFileName = null;
 
             let fileName = "help";
-            let curVersion = "1.0.2"
+            let curVersion = "1.0.3"
             let showInitHelp = false;
             let headerTemplate = "__| ^*^ |__";
             let selectedId = null;
@@ -2457,6 +2457,24 @@
                     } else if (e.key === 'Enter') {
                         if (links.length === 0) return;
                         activateSelectedLink();
+                        e.preventDefault();
+                    } else if (e.key === 'y') {
+                        if (links.length === 0) return;
+                        const link = links[linksIndex];
+                        let textToCopy = '';
+                        if (link.dataset.nodeId) {
+                            const node = findNodeById(link.dataset.nodeId);
+                            if (node) textToCopy = '_' + node.title + '_';
+                        } else if (link.href && link.href !== '#') {
+                            textToCopy = link.href;
+                        }
+                        if (textToCopy) {
+                            navigator.clipboard.writeText(textToCopy).then(() => {
+                                showMessage('Copied: ' + textToCopy);
+                            }).catch(() => {
+                                showMessage('Failed to copy');
+                            });
+                        }
                         e.preventDefault();
                     } else if (e.key === 'Escape') {
                         closeLinksDialog();
