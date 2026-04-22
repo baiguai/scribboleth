@@ -52,7 +52,7 @@
 
                 @media (max-width: 768px) {
                     .app {
-                        grid-template-columns: 1fr;
+                        grid-template-columns: 1fr !important;
                         grid-template-areas:
                         "header"
                         "editor";
@@ -65,8 +65,7 @@
                         top: 48px;               /* adjust to your header height */
                         left: 0;
                         bottom: 0;
-                        width: 75%;
-                        max-width: 300px;
+                        width: 320px;             /* default width - not affected by desktop resizing */
                         background: var(--bg);
                         border-right: 1px solid var(--border);
                         transform: translateX(-100%); /* hidden off-screen */
@@ -2841,6 +2840,8 @@
             let savedTreeWidth = 320;
             let treePanelVisible = true;
             function resizeTree(adjustment){
+                if (window.innerWidth <= 768) return;  // mobile: tree resizing not supported
+
                 const app = document.querySelector('.app');
                 if (!app) return;
 
