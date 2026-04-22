@@ -723,9 +723,9 @@
                 <p style="color:var(--dim); font-size:0.9em;">Press Enter to save, Esc to cancel.</p>
             </div>
 
-            <div id="versionDialog" class="search-dialog" style="display:none;width:300px;max-width:90vw;">
+            <div id="versionDialog" class="search-dialog" style="display: none; width: 300px; max-width: 90vw;">
                 <h3>Version</h3>
-                <p>Current Version: <span id="versionNumber"></span></p>
+                <p>Current Version: <span id="versionNumber">1.0.3</span></p>
             </div>
 
             <div id="themePickerDialog" class="search-dialog" style="display:none;width:350px;max-width:90vw;">
@@ -743,7 +743,7 @@
                     <span class="dim" id="path">/</span>
                     <span class="pill" id="msg"></span>
                 </div>
-                <textarea id="editorArea" spellcheck="false" class="" readonly="readonly"></textarea>
+                <textarea id="editorArea" spellcheck="false" readonly="readonly" class=""></textarea>
             </section>
             </div>
 
@@ -1610,7 +1610,7 @@
             let importedFileName = null;
 
             let fileName = "scribboleth_help";
-            let curVersion = "1.0.2"
+            let curVersion = "1.0.3"
             let showInitHelp = false;
             let headerTemplate = "__| ^*^ |__";
             let selectedId = null;
@@ -3279,6 +3279,24 @@
                     } else if (e.key === 'Enter') {
                         if (links.length === 0) return;
                         activateSelectedLink();
+                        e.preventDefault();
+                    } else if (e.key === 'y') {
+                        if (links.length === 0) return;
+                        const link = links[linksIndex];
+                        let textToCopy = '';
+                        if (link.dataset.nodeId) {
+                            const node = findNodeById(link.dataset.nodeId);
+                            if (node) textToCopy = '_' + node.title + '_';
+                        } else if (link.href && link.href !== '#') {
+                            textToCopy = link.href;
+                        }
+                        if (textToCopy) {
+                            navigator.clipboard.writeText(textToCopy).then(() => {
+                                showMessage('Copied: ' + textToCopy);
+                            }).catch(() => {
+                                showMessage('Failed to copy');
+                            });
+                        }
                         e.preventDefault();
                     } else if (e.key === 'Escape') {
                         closeLinksDialog();
