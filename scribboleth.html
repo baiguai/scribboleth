@@ -973,6 +973,7 @@
                     { key: "u", mode: "TREE", description: "Go up a tree node level" },
                     { key: "C", mode: "TREE", description: "Collapse all the tree nodes" },
                     { key: "E", mode: "TREE", description: "Expand all the tree nodes" },
+                    { key: "N", mode: "TREE", description: "Toggle tree visibility" },
                     { key: "]", mode: "TREE", description: "Expand the treeview panel" },
                     { key: "[", mode: "TREE", description: "Shrink the treeview panel" },
                     { key: "/", mode: "TREE", description: "Search (begin with : labels, +: all words comma sep)" },
@@ -1027,6 +1028,7 @@
                     { key: "k", mode: "TREE", description: "Select the previous tree node" },
                     { key: "l", mode: "TREE", description: "Expand the current tree node" },
                     { key: "h", mode: "TREE", description: "Collapse the current tree node" },
+                    { key: "N", mode: "TREE", description: "Toggle tree visibility" },
                     { key: "u", mode: "TREE", description: "go up a tree node level" },
                     { key: "C", mode: "TREE", description: "Collapse all the tree nodes" },
                     { key: "E", mode: "TREE", description: "Expand all the tree nodes" },
@@ -2836,6 +2838,8 @@
                 ctx.siblings.splice(ctx.index, 1);
                 selectedId = goTo ? (goTo.id || goTo) : null;
             }
+            let savedTreeWidth = 320;
+            let treePanelVisible = true;
             function resizeTree(adjustment){
                 const app = document.querySelector('.app');
                 if (!app) return;
@@ -2854,8 +2858,37 @@
                     treeWidth = 240;
                 }
 
+                savedTreeWidth = treeWidth;
+
                 // Update the grid-template-columns
                 app.style.gridTemplateColumns = `${treeWidth}px 1fr`;
+            }
+            function toggleTreePanel(){
+                const treeEl = document.getElementById('tree');
+                const app = document.querySelector('.app');
+                if (!treeEl || !app) return;
+
+                const isMobile = window.innerWidth <= 768;
+
+                if (isMobile) {
+                    treePanelVisible = !treePanelVisible;
+                    if (treePanelVisible) {
+                        treeEl.classList.add('show');
+                        treeEl.style.display = '';
+                    } else {
+                        treeEl.classList.remove('show');
+                        treeEl.style.display = 'none';
+                    }
+                } else {
+                    treePanelVisible = !treePanelVisible;
+                    if (treePanelVisible) {
+                        app.style.gridTemplateColumns = `${savedTreeWidth}px 1fr`;
+                        treeEl.style.display = '';
+                    } else {
+                        app.style.gridTemplateColumns = `0px 1fr`;
+                        treeEl.style.display = 'none';
+                    }
+                }
             }
             function insertHr() {
                 const insertText = "--------------------------------------------------------------------------------";
@@ -3238,7 +3271,7 @@
                 document.body.style.backgroundImage = 'none';
             }
 
-function renderThemeList() {
+            function renderThemeList() {
                 const list = document.getElementById('themeList');
                 list.innerHTML = '';
                 themes.forEach((theme, index) => {
@@ -4174,7 +4207,7 @@ function renderThemeList() {
                     if (!term) return renderList(data);
                     renderList(data.filter(h => matches(h, term)));
                 };
-                }
+            }
 
             function closeHelp() {
                 closeHelpDialog();
@@ -4188,7 +4221,7 @@ function renderThemeList() {
 
 
 
-                //---- Saving ----------------------------------------------------------
+            //---- Saving ----------------------------------------------------------
                 function getContents(name, saveName) {
                     const elemLimit = 50; // Number of elements per line
                     const htmlDoc = document.documentElement.cloneNode(true);
@@ -4561,6 +4594,7 @@ function renderThemeList() {
                     case 's': saveAsHtml(fileName); break;
                     case 'S': openSaveAsDialog(); break;
                     case 'n': saveViaNode(); break;
+                    case 'N': toggleTreePanel(); break;
                     case 't': exportNoteAsTxt(); break;
                     case 'T': exportTreeAsTxt(); break;
                     case ']': resizeTree(30); break;
