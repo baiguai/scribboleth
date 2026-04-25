@@ -787,7 +787,7 @@
             let importedFileName = null;
 
             let fileName = "help";
-            let curVersion = "1.0.4"
+            let curVersion = "1.0.5"
             let showInitHelp = false;
             let headerTemplate = "__| ^*^ |__";
             let selectedId = null;
@@ -4860,6 +4860,13 @@
 
                             // Re-render with new data
                             render();
+
+                            // If the imported file has auto-save enabled, update the imported file directly
+                            if (nodePort != 0) {
+                                fileName = importedFileName;
+                                document.title = importedFileName;
+                                saveViaNode();
+                            }
                         } catch (err) {
                             console.error("Failed to parse treeData:", err);
                             alert("Error parsing treeData.");
