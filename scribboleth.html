@@ -4847,6 +4847,18 @@
                                 nodePort = parseInt(nodePortMatch[1]);
                             }
 
+                            // Restore fileName from imported file
+                            const importFileNameMatch = content.match(/let\s+fileName\s*=\s*"([^"]*)";/);
+                            if (importFileNameMatch) {
+                                fileName = importFileNameMatch[1];
+                            }
+
+                            // Restore headerTemplate from imported file
+                            const headerTemplateMatch = content.match(/let\s+headerTemplate\s*=\s*"([^"]*)";/);
+                            if (headerTemplateMatch) {
+                                headerTemplate = headerTemplateMatch[1];
+                            }
+
                             // Replace theme_styles content from imported file
                             const themeStylesMatch = content.match(/<style id="theme_styles">([\s\S]*?)<\/style>/);
                             if (themeStylesMatch) {

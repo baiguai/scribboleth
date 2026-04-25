@@ -722,9 +722,9 @@
                 <p style="color:var(--dim); font-size:0.9em;">Press Enter to save, Esc to cancel.</p>
             </div>
 
-            <div id="versionDialog" class="search-dialog" style="display:none;width:300px;max-width:90vw;">
+            <div id="versionDialog" class="search-dialog" style="display: none; width: 300px; max-width: 90vw;">
                 <h3>Version</h3>
-                <p>Current Version: <span id="versionNumber"></span></p>
+                <p>Current Version: <span id="versionNumber">1.0.5</span></p>
             </div>
 
             <div id="themePickerDialog" class="search-dialog" style="display:none;width:350px;max-width:90vw;">
@@ -1609,7 +1609,7 @@
             let importedFileName = null;
 
             let fileName = "scribboleth_help";
-            let curVersion = "1.0.4"
+            let curVersion = "1.0.5"
             let showInitHelp = false;
             let headerTemplate = "__| ^*^ |__";
             let selectedId = null;
@@ -5667,6 +5667,18 @@
                             const nodePortMatch = content.match(/let\s+nodePort\s*=\s*(\d+);/);
                             if (nodePortMatch) {
                                 nodePort = parseInt(nodePortMatch[1]);
+                            }
+
+                            // Restore fileName from imported file
+                            const importFileNameMatch = content.match(/let\s+fileName\s*=\s*"([^"]*)";/);
+                            if (importFileNameMatch) {
+                                fileName = importFileNameMatch[1];
+                            }
+
+                            // Restore headerTemplate from imported file
+                            const headerTemplateMatch = content.match(/let\s+headerTemplate\s*=\s*"([^"]*)";/);
+                            if (headerTemplateMatch) {
+                                headerTemplate = headerTemplateMatch[1];
                             }
 
                             // Replace theme_styles content from imported file
