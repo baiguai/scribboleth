@@ -920,6 +920,8 @@
             let searchActive = false;
             let searchMatches = [];
             let searchIndex = 0;
+            let tagSearchPhase = 'tags';
+            let matchingTags = [];
             const helpDialog = document.getElementById('helpDialog');
             const helpDialogVimEdit = document.getElementById('helpDialogVimEdit');
             const helpDialogVimDisabled = document.getElementById('helpDialogVimDisabled');
@@ -3915,6 +3917,8 @@
                 searchInput.value = '';
                 searchInput.focus();
                 searchMatches = [];
+                matchingTags = [];
+                tagSearchPhase = 'tags';
                 searchIndex = 0;
                 renderSearchList();
             }
@@ -4032,19 +4036,26 @@
 
             function searchTreeTags(tag) {
                 searchMatches = [];
+                matchingTags = [];
                 if (!tag) {
+                    tagSearchPhase = 'tags';
                     renderSearchList();
                     return;
                 }
 
                 const tagLower = tag.toLowerCase();
-                const tagPattern = new RegExp('#' + tagLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?:\\s|$)', 'i');
+                const partialPattern = new RegExp('#' + tagLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
 
+                const allTagCounts = {};
                 (function walk(nodes) {
                     for (const n of nodes) {
                         const nodeContent = n.content || '';
-                        if (tagPattern.test(nodeContent)) {
-                            searchMatches.push(n);
+                        const matches = nodeContent.match(/#[\w-]+/g) || [];
+                        for (const t of matches) {
+                            const tagVal = t.slice(1).toLowerCase();
+                            if (tagVal.includes(tagLower)) {
+                                allTagCounts[tagVal] = (allTagCounts[tagVal] || 0) + 1;
+                            }
                         }
                         if (n.children && n.children.length) {
                             walk(n.children);
@@ -4052,12 +4063,62 @@
                     }
                 })(treeData);
 
+                const exactTag = tagLower;
+                if (allTagCounts[exactTag]) {
+                    tagSearchPhase = 'notes';
+                    const tagPattern = new RegExp('#' + exactTag.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?:\\s|$)', 'i');
+                    (function walk(nodes) {
+                        for (const n of nodes) {
+                            const nodeContent = n.content || '';
+                            if (tagPattern.test(nodeContent)) {
+                                searchMatches.push(n);
+                            }
+                            if (n.children && n.children.length) {
+                                walk(n.children);
+                            }
+                        }
+                    })(treeData);
+                } else {
+                    tagSearchPhase = 'tags';
+                    for (const t of Object.keys(allTagCounts)) {
+                        matchingTags.push('#' + t);
+                    }
+                    matchingTags.sort();
+                }
+
                 searchIndex = 0;
                 renderSearchList();
             }
 
             function renderSearchList() {
                 searchList.innerHTML = '';
+
+                if (tagSearchPhase === 'tags') {
+                    matchingTags.forEach((t, i) => {
+                        const item = document.createElement('div');
+                        item.textContent = t;
+                        if (i === searchIndex) {
+                            item.classList.add('selected');
+                            requestAnimationFrame(() => item.scrollIntoView({ block: "nearest", behavior: "smooth" }));
+                        }
+                        item.addEventListener('click', () => {
+                            if (matchingTags.length > 0) {
+                                searchIndex = i;
+                                searchInput.value = t;
+                                searchTreeTags(t.substring(1));
+                            }
+                        });
+                        searchList.appendChild(item);
+                    });
+                    if (matchingTags.length === 0) {
+                        const empty = document.createElement('div');
+                        empty.textContent = '(no matching tags)';
+                        empty.style.color = 'var(--dim)';
+                        searchList.appendChild(empty);
+                    }
+                    return;
+                }
+
                 searchMatches.forEach((n, i) => {
                     const item = document.createElement('div');
                     item.textContent = n.title || '(untitled)';
@@ -4117,15 +4178,41 @@
 
             searchInput.addEventListener('keydown', e => {
                 if (e.key === 'ArrowDown') {
-                    searchIndex = Math.min(searchIndex + 1, searchMatches.length - 1);
+                    const max = tagSearchPhase === 'tags' ? matchingTags.length - 1 : searchMatches.length - 1;
+                    searchIndex = Math.min(searchIndex + 1, max);
                     renderSearchList();
                     e.preventDefault();
                 } else if (e.key === 'ArrowUp') {
                     searchIndex = Math.max(searchIndex - 1, 0);
                     renderSearchList();
                     e.preventDefault();
+                } else if (e.key === 'Backspace' && tagSearchPhase === 'notes') {
+                    const stripped = searchInput.value.replace(/^#+/, '');
+                    if (stripped === '') {
+                        tagSearchPhase = 'tags';
+                        matchingTags = [];
+                        searchMatches = [];
+                        searchIndex = 0;
+                        searchInput.value = '#';
+                        searchTreeTags('');
+                        e.preventDefault();
+                    } else {
+                        tagSearchPhase = 'tags';
+                        matchingTags = [];
+                        searchMatches = [];
+                        searchIndex = 0;
+                        searchTreeTags(stripped);
+                        e.preventDefault();
+                    }
                 } else if (e.key === 'Enter') {
-                    if (searchMatches.length > 0) {
+                    if (tagSearchPhase === 'tags' && matchingTags.length > 0) {
+                        const selectedTag = matchingTags[searchIndex];
+                        if (selectedTag) {
+                            searchInput.value = selectedTag;
+                            searchTreeTags(selectedTag.substring(1));
+                        }
+                        e.preventDefault();
+                    } else if (searchMatches.length > 0) {
                         selectSearchResult(searchIndex);
                         closeSearch();
                         const selInfo = findNodeAndParentById(selectedId);
@@ -4138,9 +4225,8 @@
                                 render();
                                 setTimeout(() => {
                                     editorArea.focus();
-                                    // Force re-style
                                     editorArea.classList.remove('normal-mode');
-                                    void editorArea.offsetWidth; // force reflow
+                                    void editorArea.offsetWidth;
                                     editorArea.classList.add('visual-mode');
                                 }, 0);
                             }
