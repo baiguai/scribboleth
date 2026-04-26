@@ -2516,12 +2516,14 @@
                         links[linksIndex].classList.remove('selected');
                         linksIndex = (linksIndex + 1) % links.length;
                         links[linksIndex].classList.add('selected');
+                        links[linksIndex].scrollIntoView({ block: "nearest" });
                         e.preventDefault();
                     } else if (e.key === 'ArrowUp' || e.key === 'k') {
                         if (links.length === 0) return;
                         links[linksIndex].classList.remove('selected');
                         linksIndex = (linksIndex - 1 + links.length) % links.length;
                         links[linksIndex].classList.add('selected');
+                        links[linksIndex].scrollIntoView({ block: "nearest" });
                         e.preventDefault();
                     } else if (e.key === 'Enter') {
                         if (links.length === 0) return;
@@ -3282,6 +3284,7 @@
                     linksIndex = 0;
                     if (links.length > 0) {
                         links[linksIndex].classList.add('selected');
+                        links[linksIndex].scrollIntoView({ block: "nearest" });
                     }
                 }
 
