@@ -3943,6 +3943,7 @@
                     return;
                 }
 
+                tagSearchPhase = 'notes';
                 const searchTitleOnly = query.startsWith(':');
                 let q = query.startsWith(':') ? query.slice(1).toLowerCase() : query.toLowerCase();
 
@@ -4187,23 +4188,28 @@
                     renderSearchList();
                     e.preventDefault();
                 } else if (e.key === 'Backspace' && tagSearchPhase === 'notes') {
-                    const stripped = searchInput.value.replace(/^#+/, '');
-                    if (stripped === '') {
-                        tagSearchPhase = 'tags';
-                        matchingTags = [];
-                        searchMatches = [];
-                        searchIndex = 0;
-                        searchInput.value = '#';
-                        searchTreeTags('');
-                        e.preventDefault();
-                    } else {
-                        tagSearchPhase = 'tags';
-                        matchingTags = [];
-                        searchMatches = [];
-                        searchIndex = 0;
-                        searchTreeTags(stripped);
-                        e.preventDefault();
+                    const query = searchInput.value;
+                    if (query.startsWith('#')) {
+                        const stripped = query.slice(1);
+                        if (stripped === '') {
+                            tagSearchPhase = 'tags';
+                            matchingTags = [];
+                            searchMatches = [];
+                            searchIndex = 0;
+                            searchInput.value = '#';
+                            searchTreeTags('');
+                            e.preventDefault();
+                        } else {
+                            tagSearchPhase = 'tags';
+                            matchingTags = [];
+                            searchMatches = [];
+                            searchIndex = 0;
+                            searchInput.value = '#' + stripped;
+                            searchTreeTags(stripped);
+                            e.preventDefault();
+                        }
                     }
+                    // If not starting with '#', let normal backspace happen
                 } else if (e.key === 'Enter') {
                     if (tagSearchPhase === 'tags' && matchingTags.length > 0) {
                         const selectedTag = matchingTags[searchIndex];
