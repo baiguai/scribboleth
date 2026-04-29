@@ -3089,6 +3089,55 @@
 
                 ta.setRangeText(finalRows.join("\n"), start, end, "select");
             }
+            function renumberOrderedList() {
+                const ta = document.getElementById("editorArea");
+                const start = ta.selectionStart;
+                const end = ta.selectionEnd;
+                const value = ta.value;
+
+                // Get selected text or use full content if no selection
+                const sel = start !== end ? value.slice(start, end) : value;
+
+                // Split into lines
+                const lines = sel.split(/\r?\n/);
+
+                // Find lines that start with a number followed by a period
+                const numberedLinePattern = /^(\d+)\.\s?(.*)/;
+
+                // Find all numbered lines and their starting number
+                const numberedLines = [];
+                let firstNum = null;
+
+                lines.forEach((line, index) => {
+                    const match = line.match(numberedLinePattern);
+                    if (match) {
+                        const num = parseInt(match[1], 10);
+                        if (firstNum === null) firstNum = num;
+                        numberedLines.push({ index, num, match });
+                    }
+                });
+
+                // If no numbered lines found, return
+                if (numberedLines.length === 0) {
+                    showMessage("No numbered lines found");
+                    return;
+                }
+
+                // Renumber starting from firstNum
+                let currentNum = firstNum;
+                numberedLines.forEach(({ index, match }) => {
+                    const content = match[2]; // Content after the number and period
+                    lines[index] = `${currentNum}. ${content}`;
+                    currentNum++;
+                });
+
+                // Replace the text
+                const newText = lines.join("\n");
+                ta.setRangeText(newText, start, end, "select");
+
+                syncFile();
+                showMessage(`Renumbered ${numberedLines.length} line(s) starting at ${firstNum}`);
+            }
             function getCurrentLineNumber() {
                 const editorArea = document.getElementById("editorArea");
                 const text = editorArea.value;
@@ -4672,6 +4721,12 @@
                     if (e.ctrlKey && e.key === ";") {
                         e.preventDefault();
                         formatMarkdownTable();
+                    }
+
+                    if ((e.ctrlKey || e.metaKey) && e.key === "#") {
+                        e.preventDefault();
+                        renumberOrderedList();
+                        return;
                     }
 
                     return;
