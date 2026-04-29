@@ -4492,6 +4492,12 @@
                         );
                     }
 
+                    // Update the <title> tag to match current document.title
+                    htmlContent = htmlContent.replace(
+                        /<title>[^<]*<\/title>/,
+                        `<title>${document.title}</title>`
+                    );
+
                     // showInitHelp
                     htmlContent = htmlContent.replace(
                         /let\s+showInitHelp\s*=\s*(true|false);/,
@@ -5031,6 +5037,12 @@
                             const importFileNameMatch = content.match(/let\s+fileName\s*=\s*"([^"]*)";/);
                             if (importFileNameMatch) {
                                 fileName = importFileNameMatch[1];
+                            }
+
+                            // Restore document.title from imported file
+                            const importTitleMatch = content.match(/<title>([^<]*)<\/title>/);
+                            if (importTitleMatch) {
+                                document.title = importTitleMatch[1];
                             }
 
                             // Restore headerTemplate from imported file
