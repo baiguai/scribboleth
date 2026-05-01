@@ -670,7 +670,7 @@
             <div class="search-dialog" id="helpDialogUnified" style="display:none;">
               <input id="helpFilter" type="text" placeholder="Filter help (Start with : to search keys only)...">
               <div id="helpResults" class="search-results"></div>
-              <p><a href="https://hcjsuite.infinityfreeapp.com/scribboleth_help.html" target="_blank">Full Help System</a></p>
+              <p><a href="https://scribboleth.infinityfreeapp.com/" target="_blank">Full Help System</a></p>
               <p style="margin-top:6px;">Press ESC to close.</p>
             </div>
 
@@ -2104,12 +2104,17 @@
                         case "S": openSaveAsDialog(); break;
 
                         case "i": // Enter insert mode
-                        case "a":
                             if (mode_visual) {
                                 mode_select_in = true;
                                 e.preventDefault();
                                 return;
                             }
+                            setVimMode(true);
+                            mode_insert = true;
+                            performed = true;
+                            modeEl.textContent = 'INSERT';
+                            break;
+                        case "a":
                             setVimMode(true);
                             mode_insert = true;
                             performed = true;
