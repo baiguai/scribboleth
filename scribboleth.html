@@ -2104,12 +2104,17 @@
                         case "S": openSaveAsDialog(); break;
 
                         case "i": // Enter insert mode
-                        case "a":
                             if (mode_visual) {
                                 mode_select_in = true;
                                 e.preventDefault();
                                 return;
                             }
+                            setVimMode(true);
+                            mode_insert = true;
+                            performed = true;
+                            modeEl.textContent = 'INSERT';
+                            break;
+                        case "a":
                             setVimMode(true);
                             mode_insert = true;
                             performed = true;
@@ -5088,6 +5093,13 @@
 
                             // Re-render with new data
                             render();
+
+                            // If the imported file has auto-save enabled, update the imported file directly
+                            if (nodePort != 0) {
+                                fileName = importedFileName;
+                                document.title = importedFileName;
+                                saveViaNode();
+                            }
                         } catch (err) {
                             console.error("Failed to parse treeData:", err);
                             alert("Error parsing treeData.");
