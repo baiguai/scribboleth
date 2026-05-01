@@ -2104,12 +2104,17 @@
                         case "S": openSaveAsDialog(); break;
 
                         case "i": // Enter insert mode
-                        case "a":
                             if (mode_visual) {
                                 mode_select_in = true;
                                 e.preventDefault();
                                 return;
                             }
+                            setVimMode(true);
+                            mode_insert = true;
+                            performed = true;
+                            modeEl.textContent = 'INSERT';
+                            break;
+                        case "a":
                             setVimMode(true);
                             mode_insert = true;
                             performed = true;
