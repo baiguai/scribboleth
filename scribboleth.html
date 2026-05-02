@@ -5045,11 +5045,11 @@
                             }
 
                             // Restore theme from imported file
-                            const themeMatch = content.match(/let\s+currentTheme\s*=\s*(\[[\s\S]*?\]);/s);
+                            const themeMatch = content.match(/let\s+currentTheme\s*=\s*(\{[\s\S]*?\});/s);
                             if (themeMatch) {
                                 try {
                                     currentTheme = JSON.parse(themeMatch[1]);
-                                    applyTheme(currentTheme);
+                                    applyThemeColors(currentTheme);
                                 } catch (e) {
                                     console.warn('Failed to parse theme from import, using default');
                                     currentTheme = null;
@@ -5284,12 +5284,12 @@
                     }
                     
                     // Extract and restore current theme
-                    const themeMatch = htmlContent.match(/let\s+currentTheme\s*=\s*(null|\[[\s\S]*?\]);/);
+                    const themeMatch = htmlContent.match(/let\s+currentTheme\s*=\s*(null|\{[\s\S]*?\});/);
                     if (themeMatch) {
                         try {
                             currentTheme = JSON.parse(themeMatch[1]);
                             if (currentTheme) {
-                                applyTheme(currentTheme);
+                                applyThemeColors(currentTheme);
                             }
                         } catch (e) {
                             console.warn('Failed to parse currentTheme, using default');
