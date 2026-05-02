@@ -1,6 +1,21 @@
 @echo off
 setlocal enabledelayedexpansion
 
+REM Check for required Node.js and npm installation
+node --version >nul 2>&1
+if %errorlevel% neq 0 (
+    echo Error: Node.js is not installed or not in your PATH.
+    echo Please download and install Node.js from https://nodejs.org/ (npm is included).
+    exit /b 1
+)
+
+npm --version >nul 2>&1
+if %errorlevel% neq 0 (
+    echo Error: npm is not installed or not in your PATH.
+    echo npm is included with Node.js. Reinstall Node.js from https://nodejs.org/ if needed.
+    exit /b 1
+)
+
 REM Check for the correct number of arguments
 if "%~1"=="" goto usage
 
