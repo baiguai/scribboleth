@@ -1,21 +1,6 @@
 @echo off
 setlocal enabledelayedexpansion
 
-REM Check for required Node.js and npm installation
-node --version >nul 2>&1
-if %errorlevel% neq 0 (
-    echo Error: Node.js is not installed or not in your PATH.
-    echo Please download and install Node.js from https://nodejs.org/ (npm is included).
-    exit /b 1
-)
-
-npm --version >nul 2>&1
-if %errorlevel% neq 0 (
-    echo Error: npm is not installed or not in your PATH.
-    echo npm is included with Node.js. Reinstall Node.js from https://nodejs.org/ if needed.
-    exit /b 1
-)
-
 REM Check for the correct number of arguments
 if "%~1"=="" goto usage
 
@@ -65,29 +50,36 @@ if exist "%SCRNODES_BAT%" (
 
 REM Create or update the scrnodes.bat script
 if not exist "%SCRNODES_BAT%" (
-    echo @echo off > "%SCRNODES_BAT%"
-    echo. >> "%SCRNODES_BAT%"
-    echo REM 3000 >> "%SCRNODES_BAT%"
-    echo. >> "%SCRNODES_BAT%"
-    echo cd /d "%TARGET_DIR%" ^& start "Node Server for %FILENAME%" /b node "%SAVER_JS_FILE%" >> "%SCRNODES_BAT%"
-    echo. >> "%SCRNODES_BAT%"
-    echo timeout /t 3 /nobreak ^>nul >> "%SCRNODES_BAT%"
-    echo. >> "%SCRNODES_BAT%"
-    echo echo. >> "%SCRNODES_BAT%"
-    echo echo. >> "%SCRNODES_BAT%"
-    echo echo. >> "%SCRNODES_BAT%"
-    echo echo %FILENAME%: %PORT% >> "%SCRNODES_BAT%"
-    echo echo. >> "%SCRNODES_BAT%"
-    echo echo. >> "%SCRNODES_BAT%"
-    echo echo. >> "%SCRNODES_BAT%"
+    (
+        echo @echo off
+        echo.
+        echo REM %PORT%
+        echo.
+        echo cd /d "%TARGET_DIR%"
+        echo start "" /b node "%SAVER_JS_FILE%"
+        echo.
+        echo timeout /t 3 /nobreak ^>nul
+        echo.
+        echo echo.
+        echo echo.
+        echo echo.
+        echo echo %FILENAME%: %PORT%
+        echo echo.
+        echo echo.
+        echo echo.
+        echo.
+        echo :wait_loop
+        echo timeout /t 1 /nobreak ^>nul
+        echo goto wait_loop
+    ) > "%SCRNODES_BAT%"
 ) else (
-    findstr /c:"cd /d \"%TARGET_DIR%\" ^& start \"Node Server for %FILENAME%\" /b node \"%SAVER_JS_FILE%\"" "%SCRNODES_BAT%" >nul
+    findstr /c:"cd /d \"%TARGET_DIR%\" & start \"\" /b node \"%SAVER_JS_FILE%\"" "%SCRNODES_BAT%" >nul 2>&1
     if %errorlevel% neq 0 (
         REM Add the new port comment
         powershell -Command "(Get-Content -path '%SCRNODES_BAT%') + 'REM %PORT%' | Out-File -filepath '%SCRNODES_BAT%' -encoding ASCII"
-        
+
         REM Add the new node service command before timeout
-        powershell -Command "$content = Get-Content -path '%SCRNODES_BAT%'; $timeoutIndex = $content | Select-String -Pattern 'timeout' | Select -First 1 | ForEach-Object { $_.LineNumber - 1 }; $newContent = $content[0..($timeoutIndex-1)] + 'cd /d \"%TARGET_DIR%\" ^& start \"Node Server for %FILENAME%\" /b node \"%SAVER_JS_FILE%\"' + $content[$timeoutIndex..($content.Length-1)]; $newContent | Out-File -filepath '%SCRNODES_BAT%' -encoding ASCII"
+        powershell -Command "$content = Get-Content -path '%SCRNODES_BAT%'; $timeoutIndex = $content | Select-String -Pattern 'timeout' | Select -First 1 | ForEach-Object { $_.LineNumber - 1 }; $newLine = 'cd /d \"%TARGET_DIR%\"'; $newLine2 = 'start \"\" /b node \"%SAVER_JS_FILE%\"'; $newContent = $content[0..($timeoutIndex-1)] + $newLine + $newLine2 + $content[$timeoutIndex..($content.Length-1)]; $newContent | Out-File -filepath '%SCRNODES_BAT%' -encoding ASCII"
 
         REM Add the new echo statement
         powershell -Command "$content = Get-Content -path '%SCRNODES_BAT%'; $lastEchoIndex = $content | Select-String -Pattern 'echo \".*:[0-9]*\"' | Select -Last 1 | ForEach-Object { $_.LineNumber - 1 }; $newContent = $content[0..$lastEchoIndex] + 'echo %FILENAME%: %PORT%' + $content[($lastEchoIndex+1)..($content.Length-1)]; $newContent | Out-File -filepath '%SCRNODES_BAT%' -encoding ASCII"
@@ -126,7 +118,7 @@ echo To start the node services, run: %SCRNODES_BAT%
 
 cd "%TARGET_DIR%"
 powershell -Command "Set-Content -Path 'package.json' -Value '{ \"dependencies\": { \"express\": \"^5.1.0\", \"body-parser\": \"^1.20.0\" } }' -Encoding ASCII"
-npm install
+call npm install
 goto:eof
 
 :usage
