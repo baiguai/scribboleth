@@ -1,12 +1,6 @@
 @echo off
 setlocal enabledelayedexpansion
 
-REM Function to display usage
-:usage
-echo Usage: %0 ^<full_path_to_html_file^>
-echo Example: %0 C:\Users\User\Documents\notes\mynotes.html
-exit /b 1
-
 REM Check for the correct number of arguments
 if "%~1"=="" goto usage
 
@@ -100,3 +94,9 @@ goto :eof
 :uninstallation_cancelled
 echo Uninstallation cancelled.
 exit /b 0
+
+REM Function to display usage
+:usage
+echo Usage: %0 ^<full_path_to_html_file^>
+echo Example: %0 C:\Users\User\Documents\notes\mynotes.html
+exit /b 1
