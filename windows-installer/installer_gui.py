@@ -274,25 +274,29 @@ class ScribbolethInstaller:
             if last_rem_idx >= 0:
                 lines.insert(last_rem_idx + 1, f"REM {port}")
 
-            # Find :wait_loop and insert before it
+            # Find last timeout /t 3 line to insert new instance after it
+            last_timeout_idx = -1
+            for i, line in enumerate(lines):
+                if 'timeout /t 3' in line:
+                    last_timeout_idx = i
+
+            if last_timeout_idx >= 0:
+                # Insert new instance commands after last timeout (cd, start, timeout)
+                lines.insert(last_timeout_idx + 1, f'cd /d "{target_dir}"')
+                lines.insert(last_timeout_idx + 2, f'start "" /b node "{saver_file}"')
+                lines.insert(last_timeout_idx + 3, 'timeout /t 3 /nobreak >nul')
+
+            # Find :wait_loop for echo search boundary
             wait_loop_idx = -1
             for i, line in enumerate(lines):
                 if ':wait_loop' in line:
                     wait_loop_idx = i
                     break
 
-            if wait_loop_idx >= 0:
-                # Adjust for inserted REM line
-                if last_rem_idx >= 0 and last_rem_idx < wait_loop_idx:
-                    wait_loop_idx += 1
-
-                lines.insert(wait_loop_idx, f'cd /d "{target_dir}"')
-                lines.insert(wait_loop_idx + 1, f'start "" /b cmd /c "node "{saver_file}" >nul 2>&1"')
-                wait_loop_idx += 2
-
-            # Find last echo line and add new one
+            # Find last echo line before wait_loop and add new one
             last_echo_idx = -1
-            for i in range(min(wait_loop_idx, len(lines))):
+            search_end = wait_loop_idx if wait_loop_idx >= 0 else len(lines)
+            for i in range(search_end):
                 if re.search(r'echo\s+\S+:\s*\d+', lines[i]):
                     last_echo_idx = i
 
@@ -310,14 +314,11 @@ class ScribbolethInstaller:
 
         else:
             self.log_install("Creating new scrnodes.bat...")
-            # Escape backslashes for batch file
-            target_dir_bat = str(target_dir).replace('\\', '\\\\')
-            saver_file_bat = str(saver_file).replace('\\', '\\\\')
             content = f"""@echo off
 REM {port}
 
 cd /d "{target_dir}"
-start "" /b cmd /c "node \\"{saver_file_bat}\\" >nul 2>&1"
+start "" /b node "{saver_file}"
 
 timeout /t 3 /nobreak >nul
 
