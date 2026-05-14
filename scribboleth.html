@@ -273,6 +273,7 @@
                     flex: 1;
                     border-top: 1px solid var(--border);
                     border-bottom: 1px solid var(--border);
+                    overflow-y: auto;
                 }
 
                 .search-results div {
@@ -922,6 +923,8 @@
             let searchIndex = 0;
             let tagSearchPhase = 'tags';
             let matchingTags = [];
+            let peekActive = false;
+            let peekSavedId = null;
             const helpDialog = document.getElementById('helpDialog');
             const helpDialogVimEdit = document.getElementById('helpDialogVimEdit');
             const helpDialogVimDisabled = document.getElementById('helpDialogVimDisabled');
@@ -978,6 +981,7 @@
                     { key: "]", mode: "TREE", description: "Expand the treeview panel" },
                     { key: "[", mode: "TREE", description: "Shrink the treeview panel" },
                     { key: "/", mode: "TREE", description: "Search (begin with : labels, # tags, +: all words comma sep)" },
+                    { key: "\\", mode: "TREE", description: "Peek search (search results replace treeview)" },
                     { key: "f", mode: "TREE", description: "Find text in the current note " },
                     { key: "#", mode: "TREE", description: "Show note links dialog" },
                     { key: "<", mode: "TREE", description: "Show the history dialog" },
@@ -1049,6 +1053,7 @@
                     { key: "i", mode: "TREE", description: "Edit current note" },
                     { key: "I", mode: "TREE", description: "Edit current note" },
                     { key: "/", mode: "TREE", description: "Search (begin with : labels, # tags, +: all words comma sep)" },
+                    { key: "\\", mode: "TREE", description: "Peek search (search results replace treeview)" },
                     { key: "f", mode: "TREE", description: "Find/Replace text in the current note " },
                     { key: "#", mode: "TREE", description: "Show note links dialog" },
                     { key: "<", mode: "TREE", description: "Show the history dialog" },
@@ -3553,6 +3558,11 @@
                 closeMarksDialog();
                 closeHistoryDialog();
                 closeVersionDialog();
+                if (peekActive) {
+                    selectedId = peekSavedId;
+                    closePeekSearch();
+                    render();
+                }
             }
 
         //---- Finding and Replacing -------------------------------------------
@@ -4006,6 +4016,32 @@
                 searchDialog.style.display = 'none';
             }
 
+            function openPeekSearch() {
+                peekActive = true;
+                peekSavedId = selectedId;
+                const treeEl = document.getElementById('tree');
+                const treeRect = treeEl.getBoundingClientRect();
+                searchDialog.style.top = treeRect.top + 'px';
+                searchDialog.style.left = treeRect.left + 'px';
+                searchDialog.style.width = treeRect.width + 'px';
+                searchDialog.style.height = treeRect.height + 'px';
+                searchDialog.style.maxHeight = treeRect.height + 'px';
+                searchDialog.style.transform = 'none';
+                searchDialog.style.maxWidth = 'none';
+                openSearch();
+            }
+
+            function closePeekSearch() {
+                peekActive = false;
+                searchDialog.style.top = '';
+                searchDialog.style.left = '';
+                searchDialog.style.width = '';
+                searchDialog.style.height = '';
+                searchDialog.style.maxHeight = '';
+                searchDialog.style.transform = '';
+                searchDialog.style.maxWidth = '';
+            }
+
             function searchTree(query) {
                 searchMatches = [];
                 if (query.startsWith("#:")) {
@@ -4209,6 +4245,7 @@
                         if (searchMatches.length > 0) {
                             selectSearchResult(i);
                             closeSearch();
+                            if (peekActive) closePeekSearch();
                             const selInfo = findNodeAndParentById(selectedId);
                             if (selInfo && !isFolder(selInfo.node)) {
                                 editing = true;
@@ -4260,10 +4297,18 @@
                     const max = tagSearchPhase === 'tags' ? matchingTags.length - 1 : searchMatches.length - 1;
                     searchIndex = Math.min(searchIndex + 1, max);
                     renderSearchList();
+                    if (peekActive && tagSearchPhase !== 'tags' && searchMatches.length > 0) {
+                        const n = searchMatches[searchIndex];
+                        if (n) { selectedId = n.id; expandToNode(n.id); render(); }
+                    }
                     e.preventDefault();
                 } else if (e.key === 'ArrowUp') {
                     searchIndex = Math.max(searchIndex - 1, 0);
                     renderSearchList();
+                    if (peekActive && tagSearchPhase !== 'tags' && searchMatches.length > 0) {
+                        const n = searchMatches[searchIndex];
+                        if (n) { selectedId = n.id; expandToNode(n.id); render(); }
+                    }
                     e.preventDefault();
                 } else if (e.key === 'Backspace' && tagSearchPhase === 'notes') {
                     const query = searchInput.value;
@@ -4299,6 +4344,7 @@
                     } else if (searchMatches.length > 0) {
                         selectSearchResult(searchIndex);
                         closeSearch();
+                        if (peekActive) closePeekSearch();
                         const selInfo = findNodeAndParentById(selectedId);
                         if (selInfo && !isFolder(selInfo.node)) {
                             if (!readOnly) {
@@ -4317,7 +4363,14 @@
                         }
                     }
                 } else if (e.key === 'Escape') {
-                    closeSearch();
+                    if (peekActive) {
+                        selectedId = peekSavedId;
+                        render();
+                        closeSearch();
+                        closePeekSearch();
+                    } else {
+                        closeSearch();
+                    }
                 }
             });
 
@@ -4803,6 +4856,12 @@
 
                 if (e.key === '/' && !editing && !dialogOpen()) {
                     openSearch();
+                    e.preventDefault();
+                    return;
+                }
+
+                if (e.key === '\\' && !editing && !dialogOpen()) {
+                    openPeekSearch();
                     e.preventDefault();
                     return;
                 }
