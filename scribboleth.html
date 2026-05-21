@@ -788,7 +788,7 @@
             let importedFileName = null;
 
             let fileName = "help";
-            let curVersion = "1.0.6"
+            let curVersion = "1.0.7"
             let showInitHelp = false;
             let headerTemplate = "__| ^*^ |__";
             let selectedId = null;
@@ -4150,7 +4150,7 @@
             }
 
             function searchTreeRegex(query) {
-                const rxPattern = new RegExp(query, 'i');
+                const rxPattern = new RegExp(query, 'ims');
                 let res = [];
 
                 (function walk(nodes) {
