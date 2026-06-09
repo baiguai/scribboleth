@@ -788,7 +788,7 @@
             let importedFileName = null;
 
             let fileName = "help";
-            let curVersion = "1.0.6"
+            let curVersion = "1.0.7"
             let showInitHelp = false;
             let headerTemplate = "__| ^*^ |__";
             let selectedId = null;
@@ -980,7 +980,7 @@
                     { key: "N", mode: "TREE", description: "Toggle tree visibility" },
                     { key: "]", mode: "TREE", description: "Expand the treeview panel" },
                     { key: "[", mode: "TREE", description: "Shrink the treeview panel" },
-                    { key: "/", mode: "TREE", description: "Search (begin with : labels, # tags, +: all words comma sep)" },
+                    { key: "/", mode: "TREE", description: "Search (begin with : labels, r: regex, # tags, +: all words comma sep)" },
                     { key: "\\", mode: "TREE", description: "Peek search (search results replace treeview)" },
                     { key: "f", mode: "TREE", description: "Find text in the current note " },
                     { key: "#", mode: "TREE", description: "Show note links dialog" },
@@ -1052,7 +1052,7 @@
                     { key: "D", mode: "TREE", description: "Delete the current node" },
                     { key: "i", mode: "TREE", description: "Edit current note" },
                     { key: "I", mode: "TREE", description: "Edit current note" },
-                    { key: "/", mode: "TREE", description: "Search (begin with : labels, # tags, +: all words comma sep)" },
+                    { key: "/", mode: "TREE", description: "Search (begin with : labels, r: regex, # tags, +: all words comma sep)" },
                     { key: "\\", mode: "TREE", description: "Peek search (search results replace treeview)" },
                     { key: "f", mode: "TREE", description: "Find/Replace text in the current note " },
                     { key: "#", mode: "TREE", description: "Show note links dialog" },
@@ -4150,7 +4150,7 @@
             }
 
             function searchTreeRegex(query) {
-                const rxPattern = new RegExp(query, 'i');
+                const rxPattern = new RegExp(query, 'ims');
                 let res = [];
 
                 (function walk(nodes) {
@@ -4782,7 +4782,7 @@
                     // Add content
                     if (node.content && node.content.trim() !== "" && !node.content.includes("#noexp")) {
                         const contentLines = node.content.split('\n').map(line => indent + line);
-                        content += contentLines.join('\n') + "\n\n";
+                        content += contentLines.join('\n') + "\n\n\n\n";
                     }
 
                     // Process children
