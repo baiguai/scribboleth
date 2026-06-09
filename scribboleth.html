@@ -4782,7 +4782,7 @@
                     // Add content
                     if (node.content && node.content.trim() !== "" && !node.content.includes("#noexp")) {
                         const contentLines = node.content.split('\n').map(line => indent + line);
-                        content += contentLines.join('\n') + "\n\n";
+                        content += contentLines.join('\n') + "\n\n\n\n";
                     }
 
                     // Process children
