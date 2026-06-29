@@ -663,19 +663,19 @@
 
             <div class="search-dialog" id="linkSearchDialog" style="display: none;">
                 <input id="linkSearchInput" placeholder="Search to insert link..." type="text">
-                <div class="search-results" id="linkSearchList"></div>
+                <div class="search-results" id="linkSearchList"><div>About</div><div class="selected">About Scribboleth</div></div>
             </div>
 
-            <div class="search-dialog" id="helpDialogUnified" style="display:none;">
+            <div class="search-dialog" id="helpDialogUnified" style="display: none;">
               <input id="helpFilter" type="text" placeholder="Filter help (Start with : to search keys only)...">
-              <div id="helpResults" class="search-results"></div>
+              <div id="helpResults" class="search-results"><div><b>#</b> <span class="dim">(TREE) - </span>Show note links dialog</div><div><b>X</b> <span class="dim">(TREE) - </span>Show broken note links</div><div><b>Control+'</b> <span class="dim">(INSERT) - </span>Insert Link</div></div>
               <p><a href="https://scribboleth.infinityfreeapp.com/" target="_blank">Full Help System</a></p>
               <p style="margin-top:6px;">Press ESC to close.</p>
             </div>
 
             <div id="linksDialog" ondblclick="closeLinksDialog();" style="display: none;">
                 <h3>Links in Note</h3>
-                <div id="linksList"><a href="#" data-node-id="kqr4o4g3" class="selected">The Options Dialog</a></div>
+                <div id="linksList"><a href="https://tiddlywiki.com/" target="_blank" class="">TiddlyWiki</a><a href="#" data-node-id="si1l1krb" class="">Vim Keys Notes</a><a href="#" data-node-id="ws3qw26g" class="selected">About Scribboleth</a><a href="#" data-node-id="eg9zuwag">Saving</a><a href="#" data-node-id="gl90gp34">Introduction to Mobile Mode</a></div>
             </div>
 
             <div id="marksDialog" style="display: none;">
@@ -708,7 +708,7 @@
             <div id="historyDialog" style="display: none;">
                 <h3>History</h3>
                 <div class="history-content">
-                    <div id="historyList"></div>
+                    <div id="historyList"><div>About Scribboleth</div><div class="selected" style="background: var(--sel-bg);">Introduction</div><div>Installing Scribboleth</div><div>Upgrading Scribboleth</div><div>Introduction to History</div><div>Installer Application</div><div>Using the Uninstaller Script</div><div>Using the Installer Script</div><div>Copy the Files</div><div>Configure the Saver File</div><div>Configure Your Notes File</div><div>Install Node and NPM</div><div>Benefits of Advanced Saving</div><div>Introduction to Advanced Saving</div><div>Tables</div><div>Wrap Text</div><div>Export Current Branch</div><div>Export Current Note</div><div>Easily Add Reference Links</div><div>Linking to Other Nodes</div><div>Using the Links Dialog</div><div>Introduction to Saving</div><div>Introduction to Pinning Clips</div></div>
                 </div>
             </div>
 
@@ -735,15 +735,15 @@
             </div>
 
 
-            <aside class="tree" id="tree" onclick="closeDialogs(); activateTree();"><ul><li><div class="node selected"><span class="twisty"><svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="1" fill="currentColor"></circle></svg></span><span class="title">Introduction</span></div></li><li><div class="node"><span class="twisty"><svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="1" fill="currentColor"></circle></svg></span><span class="title">Installing Scribboleth</span></div></li><li><div class="node"><span class="twisty"><svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="1" fill="currentColor"></circle></svg></span><span class="title">Upgrading Scribboleth</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">The Interface</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Bookmarks</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">History</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Pinned Clips</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Saving</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Configuration</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Linking</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Keys</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Upcoming</span></div></li></ul></aside>
+            <aside class="tree" id="tree" onclick="closeDialogs(); activateTree();"><ul><li><div class="node"><span class="twisty"><svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="1" fill="currentColor"></circle></svg></span><span class="title">Introduction</span></div></li><li><div class="node"><span class="twisty"><svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="1" fill="currentColor"></circle></svg></span><span class="title">Installing Scribboleth</span></div></li><li><div class="node"><span class="twisty"><svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="1" fill="currentColor"></circle></svg></span><span class="title">Upgrading Scribboleth</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">The Interface</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Bookmarks</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">History</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Pinned Clips</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Saving</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Configuration</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Linking</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Keys</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M1 3 L5 7 L9 3 Z" fill="currentColor"></path></svg></span><span class="title">About</span></div><ul><li><div class="node selected"><span class="twisty"><svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="1" fill="currentColor"></circle></svg></span><span class="title">About Scribboleth</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Upcoming</span></div></li></ul></li></ul></aside>
             <section class="editor">
                 <div id="statusBar" class="status" onclick="closeDialogs();" ondblclick="toggleMobileMenu();" title="Double click to toggle Mobile Mode">
-                    <span class="pill" id="mode" style="display: block;">TREE</span>
+                    <span class="pill" id="mode" style="display: block;">NORMAL</span>
                     <span class="pill" id="kind">NOTE</span>
-                    <span class="dim" id="path">/</span>
+                    <span class="dim" id="path">/About</span>
                     <span class="pill" id="msg"></span>
                 </div>
-                <textarea id="editorArea" spellcheck="false" readonly="readonly" class=""></textarea>
+                <textarea id="editorArea" spellcheck="false" class="normal-mode"></textarea>
             </section>
             </div>
 
@@ -763,7 +763,7 @@
   {
     "id": "7tvrov2y",
     "title": "Introduction",
-    "content": "Introduction\n--------------------------------------------------------------------------------\n\nScribboleth is a plain text editor that is a stand alone HTML file. It is fully\nkeyboard driven. To quickly access the key-bindings press: ?\n\nIf you are familiar with Vim key-bindings you should find Scribboleth fairly\ncomfortable. However there is a mode that isn't in Vim - TREE. This mode\noperates on the treeview. And not all bindings function the same as in Vim.\nBe sure to consult the following topic:\n\n_Vim Keys Notes_\n\nBeing a stand alone HTML file, saving doesn't behave as a typical application\nwould so be sure to consult the _Saving_ topic.\n\n\nCompatibility\n--------------------------------------------------------------------------------\n\nBeing a stand alone HTML file, Scribboleth can be used on any device with a\nJavascript-enabled web browser on it. However virtual keyboards (like those\nfound on mobile phones) may be problematic. This is because they are typically\nonly visible when a text field is selected - and because they generally lack\nan escape key. However if you have a tablet with a physical keyboard, Scribboleth\nSHOULD work fine for you.\n\n\nMobile Mode\n--------------------------------------------------------------------------------\n\nIf you are on a device that doesn't have a physical keyboard, you can still use\nScribboleth, however its functionality is limited. Refer to the following topics:\n\n_Introduction to Mobile Mode_",
+    "content": "Introduction\n--------------------------------------------------------------------------------\n\nScribboleth is a plain text editor that is a stand alone HTML file. It is fully\nkeyboard driven. To quickly access the key-bindings press: ?\n\nIf you are familiar with Vim key-bindings you should find Scribboleth fairly\ncomfortable. However there is a mode that isn't in Vim - TREE. This mode\noperates on the treeview. And not all bindings function the same as in Vim.\nBe sure to consult the following topic:\n\n_Vim Keys Notes_\n\nScribboleth was inspired by:\n\n[TiddlyWiki]\nhttps://tiddlywiki.com/\n\nTo read more, check out _About Scribboleth_\n\nBeing a stand alone HTML file, saving doesn't behave as a typical application\nwould so be sure to consult the _Saving_ topic.\n\n\nCompatibility\n--------------------------------------------------------------------------------\n\nBeing a stand alone HTML file, Scribboleth can be used on any device with a\nJavascript-enabled web browser on it. However virtual keyboards (like those\nfound on mobile phones) may be problematic. This is because they are typically\nonly visible when a text field is selected - and because they generally lack\nan escape key. However if you have a tablet with a physical keyboard, Scribboleth\nSHOULD work fine for you.\n\n\nMobile Mode\n--------------------------------------------------------------------------------\n\nIf you are on a device that doesn't have a physical keyboard, you can still use\nScribboleth, however its functionality is limited. Refer to the following topics:\n\n_Introduction to Mobile Mode_",
     "children": [],
     "expanded": false
   },
@@ -1522,34 +1522,45 @@
     "expanded": false
   },
   {
-    "id": "ll0avfrr",
-    "title": "Upcoming",
+    "id": "0b7r7iup",
+    "title": "About",
     "content": "",
     "children": [
       {
-        "id": "adwclfet",
-        "title": "Bug Fixes",
-        "content": "Bug Fixes\n--------------------------------------------------------------------------------\n\n* 'dd' Line Delete\n    * Fix so that if the current line is the last in the note, move the cursor\n      up and delete the line.",
+        "id": "ws3qw26g",
+        "title": "About Scribboleth",
+        "content": "About Scribboleth\n--------------------------------------------------------------------------------\n\nScribboleth is the result of a long journey through VERY nerdy lands.\n\nIt all began with TiddlyWiki.",
         "children": [],
         "expanded": false
       },
       {
-        "id": "ghhwnt73",
-        "title": "New Features",
-        "content": "New Features\n--------------------------------------------------------------------------------\n\n* Macros\n    * Add the macros feature, and allow any action - including dialog-based\n      actions like search, and select results etc.\n    * Make key code help a searchable list.",
-        "children": [],
+        "id": "ll0avfrr",
+        "title": "Upcoming",
+        "content": "",
+        "children": [
+          {
+            "id": "adwclfet",
+            "title": "Bug Fixes",
+            "content": "Bug Fixes\n--------------------------------------------------------------------------------\n\n* 'dd' Line Delete\n    * Fix so that if the current line is the last in the note, move the cursor\n      up and delete the line.",
+            "children": [],
+            "expanded": false
+          },
+          {
+            "id": "ghhwnt73",
+            "title": "New Features",
+            "content": "New Features\n--------------------------------------------------------------------------------\n\n* Macros\n    * Add the macros feature, and allow any action - including dialog-based\n      actions like search, and select results etc.\n    * Make key code help a searchable list.",
+            "children": [],
+            "expanded": false
+          }
+        ],
         "expanded": false
       }
     ],
-    "expanded": false
+    "expanded": true
   }
 ];
             let bookmarks = [];
             let historyStack = [
-    {
-        "id": "j9kn2t3z",
-        "title": "Introduction to History"
-    },
     {
         "id": "2sc3y3ue",
         "title": "Introduction to Pinning Clips"
@@ -1585,14 +1596,6 @@
     {
         "id": "e1ehbevm",
         "title": "Tables"
-    },
-    {
-        "id": "wwyj1tyj",
-        "title": "Installing Scribboleth"
-    },
-    {
-        "id": "dql0lz6i",
-        "title": "Upgrading Scribboleth"
     },
     {
         "id": "bdc6h40i",
@@ -1631,8 +1634,24 @@
         "title": "Installer Application"
     },
     {
+        "id": "j9kn2t3z",
+        "title": "Introduction to History"
+    },
+    {
+        "id": "dql0lz6i",
+        "title": "Upgrading Scribboleth"
+    },
+    {
+        "id": "wwyj1tyj",
+        "title": "Installing Scribboleth"
+    },
+    {
         "id": "7tvrov2y",
         "title": "Introduction"
+    },
+    {
+        "id": "ws3qw26g",
+        "title": "About Scribboleth"
     }
 ];
 
