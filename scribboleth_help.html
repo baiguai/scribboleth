@@ -658,7 +658,7 @@
 
             <div class="search-dialog" id="searchDialog" style="display: none;">
                 <input id="searchInput" placeholder="Search... (# for tags, r: regex, +: words)" type="text">
-                <div class="search-results" id="searchList"><div>Using the Installer Script</div><div>Windows</div><div class="selected">Installer Application</div></div>
+                <div class="search-results" id="searchList"><div class="selected">Other Options</div></div>
             </div>
 
             <div class="search-dialog" id="linkSearchDialog" style="display: none;">
@@ -675,7 +675,7 @@
 
             <div id="linksDialog" ondblclick="closeLinksDialog();" style="display: none;">
                 <h3>Links in Note</h3>
-                <div id="linksList"><a href="https://tiddlywiki.com/" target="_blank" class="">TiddlyWiki</a><a href="#" data-node-id="si1l1krb" class="">Vim Keys Notes</a><a href="#" data-node-id="ws3qw26g" class="selected">About Scribboleth</a><a href="#" data-node-id="eg9zuwag" class="">Saving</a><a href="#" data-node-id="gl90gp34" class="">Introduction to Mobile Mode</a></div>
+                <div id="linksList"><a href="#" data-node-id="kqr4o4g3" class="selected">The Options Dialog</a></div>
             </div>
 
             <div id="marksDialog" style="display: none;">
@@ -743,7 +743,7 @@
                     <span class="dim" id="path">/</span>
                     <span class="pill" id="msg"></span>
                 </div>
-                <textarea id="editorArea" spellcheck="false" class="" readonly="readonly"></textarea>
+                <textarea id="editorArea" spellcheck="false" readonly="readonly" class=""></textarea>
             </section>
             </div>
 
@@ -6248,6 +6248,10 @@
 
         //---- Init ------------------------------------------------------------
             window.addEventListener('load', function() {
+                // Clear any lingering notification state
+                msgEl.textContent = "";
+                msgEl.classList.remove("visible");
+
                 // Fix Help Data
                 helpVimEnabled.push(...helpVimDisabled);
 
