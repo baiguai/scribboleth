@@ -10,6 +10,7 @@ import sys
 import shutil
 import subprocess
 import re
+import threading
 from pathlib import Path
 from tkinter import *
 from tkinter import ttk, filedialog, messagebox
@@ -22,6 +23,7 @@ class ScribbolethInstaller:
         self.root.resizable(True, True)
 
         self.scrnodes_path = Path.home() / "scrnodes.bat"
+        self.run_process = None
 
         # Get base directory - works both for .py and .exe (PyInstaller)
         if getattr(sys, 'frozen', False):
@@ -31,6 +33,7 @@ class ScribbolethInstaller:
             # Running as .py script
             self.base_dir = Path(__file__).parent.parent
 
+        self.setup_dark_mode()
         self.setup_ui()
 
     def setup_ui(self):
@@ -52,11 +55,34 @@ class ScribbolethInstaller:
         notebook.add(uninstall_frame, text="Uninstall")
         self.setup_uninstall_tab(uninstall_frame)
 
+        # Run tab
+        run_frame = Frame(notebook)
+        notebook.add(run_frame, text="Run")
+        self.setup_run_tab(run_frame)
+
         # Status bar
         self.status_var = StringVar()
         self.status_var.set("Ready")
-        status_bar = Label(self.root, textvariable=self.status_var, relief=SUNKEN, anchor=W)
+        status_bar = Label(self.root, textvariable=self.status_var, relief=SUNKEN, anchor=W,
+                          bg='#0a0a0a', fg='#aaaaaa')
         status_bar.pack(side=BOTTOM, fill=X)
+
+    def setup_dark_mode(self):
+        self.root.configure(bg='#1e1e1e')
+        self.root.option_add('*background', '#1e1e1e')
+        self.root.option_add('*foreground', '#ffffff')
+        self.root.option_add('*selectBackground', '#3c3c3c')
+        self.root.option_add('*selectForeground', '#ffffff')
+        self.root.option_add('*Entry.background', '#2d2d2d')
+        self.root.option_add('*Entry.foreground', '#ffffff')
+        self.root.option_add('*Text.background', '#2d2d2d')
+        self.root.option_add('*Text.foreground', '#ffffff')
+        self.root.option_add('*insertBackground', '#ffffff')
+        style = ttk.Style()
+        style.theme_use('clam')
+        style.configure('TNotebook', background='#1e1e1e', borderwidth=0)
+        style.configure('TNotebook.Tab', background='#2d2d2d', foreground='#ffffff', padding=[10, 2])
+        style.map('TNotebook.Tab', background=[('selected', '#3c3c3c')])
 
     def setup_install_tab(self, frame):
         Label(frame, text="Install New Scribboleth Instance", font=("Arial", 12)).pack(pady=10)
@@ -89,7 +115,7 @@ class ScribbolethInstaller:
 
         # Log area
         Label(frame, text="Log:").pack(anchor='w', padx=20)
-        self.install_log = Text(frame, height=10, wrap=WORD)
+        self.install_log = Text(frame, height=10, wrap=WORD, bg='#1a1a1a', fg='#ffffff', insertbackground='#ffffff')
         self.install_log.pack(fill='both', expand=True, padx=20, pady=5)
 
     def setup_uninstall_tab(self, frame):
@@ -114,7 +140,7 @@ class ScribbolethInstaller:
 
         # Log area
         Label(frame, text="Log:").pack(anchor='w', padx=20)
-        self.uninstall_log = Text(frame, height=10, wrap=WORD)
+        self.uninstall_log = Text(frame, height=10, wrap=WORD, bg='#1a1a1a', fg='#ffffff', insertbackground='#ffffff')
         self.uninstall_log.pack(fill='both', expand=True, padx=20, pady=5)
 
     def browse_install_path(self):
@@ -177,17 +203,12 @@ class ScribbolethInstaller:
         html_file = target_dir / f"{filename}.html"
         saver_file = target_dir / f"svr_{filename}.js"
 
-        # Check if already exists
-        if html_file.exists() and saver_file.exists():
+        # Check if saver.js already exists (full installation already present)
+        if saver_file.exists():
             messagebox.showerror("Error", f"Installation for {filename} already exists")
             return
 
         self.log_install(f"Installing {filename} in {target_dir}")
-
-        # Determine port
-        port = self.get_next_port()
-        self.port_var.set(str(port))
-        self.log_install(f"Using port {port}")
 
         try:
             # Check for Node.js and npm
@@ -203,17 +224,29 @@ class ScribbolethInstaller:
             # Create target directory
             target_dir.mkdir(parents=True, exist_ok=True)
 
-            # Copy and modify HTML file
-            src_html = self.base_dir / "scribboleth.html"
-            if not src_html.exists():
-                messagebox.showerror("Error", f"scribboleth.html not found in {self.base_dir}")
-                return
+            # Determine port: read from existing html or get a new one
+            if html_file.exists():
+                html_content = html_file.read_text()
+                port_match = re.search(r'let nodePort = (\d+);', html_content)
+                port = int(port_match.group(1)) if port_match else self.get_next_port()
+                self.log_install(f"Existing HTML found, using port {port}")
+            else:
+                port = self.get_next_port()
+                self.log_install(f"Using port {port}")
 
-            html_content = src_html.read_text()
-            html_content = re.sub(r'let nodePort = \d+;', f'let nodePort = {port};', html_content)
-            html_content = re.sub(r'let fileName = ".*?";', f'let fileName = "{filename}";', html_content)
-            html_file.write_text(html_content)
-            self.log_install(f"Created {html_file}")
+                # Copy and modify HTML file (only if it doesn't already exist)
+                src_html = self.base_dir / "scribboleth.html"
+                if not src_html.exists():
+                    messagebox.showerror("Error", f"scribboleth.html not found in {self.base_dir}")
+                    return
+
+                html_content = src_html.read_text()
+                html_content = re.sub(r'let nodePort = \d+;', f'let nodePort = {port};', html_content)
+                html_content = re.sub(r'let fileName = ".*?";', f'let fileName = "{filename}";', html_content)
+                html_file.write_text(html_content)
+                self.log_install(f"Created {html_file}")
+
+            self.port_var.set(str(port))
 
             # Copy and modify saver.js
             src_saver = self.base_dir / "saver.js"
@@ -440,6 +473,84 @@ goto wait_loop
         self.scrnodes_path.write_text('\n'.join(cleaned), encoding='ascii')
         self.log_uninstall("scrnodes.bat cleaned")
 
+
+    def setup_run_tab(self, frame):
+        Label(frame, text="Run Scribboleth Service", font=("Arial", 12)).pack(pady=10)
+
+        btn_frame = Frame(frame)
+        btn_frame.pack(pady=10)
+
+        self.run_btn = Button(btn_frame, text="Run", command=self.run_service,
+                             bg="#0d7377", fg="white", font=("Arial", 10, "bold"),
+                             height=2, width=10)
+        self.run_btn.pack(side=LEFT, padx=5)
+
+        self.stop_btn = Button(btn_frame, text="Stop", command=self.stop_service,
+                              bg="#a02020", fg="white", font=("Arial", 10, "bold"),
+                              height=2, width=10, state=DISABLED)
+        self.stop_btn.pack(side=LEFT, padx=5)
+
+        Label(frame, text="Output:").pack(anchor='w', padx=20)
+        self.run_log = Text(frame, height=10, wrap=WORD, bg='#1a1a1a', fg='#ffffff', insertbackground='#ffffff')
+        self.run_log.pack(fill='both', expand=True, padx=20, pady=5)
+
+    def run_service(self):
+        if not self.scrnodes_path.exists():
+            messagebox.showerror("Error", f"{self.scrnodes_path} not found.\nInstall an instance first.")
+            return
+
+        self.run_log.delete(1.0, END)
+        self.run_log.insert(END, f"Starting {self.scrnodes_path}...\n")
+        self.run_btn.config(state=DISABLED)
+        self.stop_btn.config(state=NORMAL)
+        self.status_var.set("Running scrnodes.bat...")
+
+        try:
+            self.run_process = subprocess.Popen(
+                str(self.scrnodes_path),
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                text=True,
+                bufsize=1,
+                cwd=str(Path.home())
+            )
+            threading.Thread(target=self._read_output, daemon=True).start()
+        except Exception as e:
+            self.run_log.insert(END, f"Error: {e}\n")
+            self.run_btn.config(state=NORMAL)
+            self.stop_btn.config(state=DISABLED)
+            self.status_var.set("Ready")
+
+    def stop_service(self):
+        if self.run_process:
+            self.run_process.terminate()
+            self.run_process = None
+        self.run_log.insert(END, "\n--- Stopped ---\n")
+        self.run_btn.config(state=NORMAL)
+        self.stop_btn.config(state=DISABLED)
+        self.status_var.set("Ready")
+
+    def _read_output(self):
+        try:
+            for line in iter(self.run_process.stdout.readline, ''):
+                if not line:
+                    break
+                self.run_log.insert(END, line)
+                self.run_log.see(END)
+                self.root.update_idletasks()
+        except (ValueError, OSError):
+            pass
+        finally:
+            self.root.after(0, self._on_process_end)
+
+    def _on_process_end(self):
+        self.run_process = None
+        self.run_btn.config(state=NORMAL)
+        self.stop_btn.config(state=DISABLED)
+        self.status_var.set("Ready")
+        self.run_log.insert(END, "--- Process exited ---\n")
+        self.run_log.see(END)
 
 if __name__ == "__main__":
     root = Tk()
