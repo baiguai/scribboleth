@@ -16,24 +16,32 @@ SCRNODES_SH="$HOME/scrnodes.sh"
 HTML_FILE="$TARGET_DIR/$FILENAME.html"
 SAVER_JS_FILE="$TARGET_DIR/svr_$FILENAME.js"
 
-# Check if the files already exist
-if [ -f "$HTML_FILE" ] && [ -f "$SAVER_JS_FILE" ]; then
+# Check if saver.js already exists (full installation already present)
+if [ -f "$SAVER_JS_FILE" ]; then
     echo "Installation for $FILENAME in $TARGET_DIR already exists. Aborting."
     exit 0
 fi
 
-# Determine the next available port
-PORT=3000
-if [ -f "$SCRNODES_SH" ]; then
-    # Find the last port number from the comments at the top of the script
-    LAST_PORT=$(grep -E '^# [0-9]+$' "$SCRNODES_SH" | tail -n 1 | sed 's/# //')
-    if [ -n "$LAST_PORT" ]; then
-        PORT=$((LAST_PORT + 1))
-    else
-        # If no port comments are found, check for the old format
-        LAST_PORT=$(grep -o 'echo.*: [0-9]*' "$SCRNODES_SH" | tail -n 1 | grep -o '[0-9]*$')
+# If HTML file already exists, read its port; otherwise find next available
+if [ -f "$HTML_FILE" ]; then
+    PORT=$(sed -n 's/.*let nodePort = \([0-9]*\);/\1/p' "$HTML_FILE")
+    if [ -z "$PORT" ]; then
+        PORT=3000
+    fi
+    echo "Existing HTML found, using port $PORT"
+else
+    PORT=3000
+    if [ -f "$SCRNODES_SH" ]; then
+        # Find the last port number from the comments at the top of the script
+        LAST_PORT=$(grep -E '^# [0-9]+$' "$SCRNODES_SH" | tail -n 1 | sed 's/# //')
         if [ -n "$LAST_PORT" ]; then
             PORT=$((LAST_PORT + 1))
+        else
+            # If no port comments are found, check for the old format
+            LAST_PORT=$(grep -o 'echo.*: [0-9]*' "$SCRNODES_SH" | tail -n 1 | grep -o '[0-9]*$')
+            if [ -n "$LAST_PORT" ]; then
+                PORT=$((LAST_PORT + 1))
+            fi
         fi
     fi
 fi
@@ -89,9 +97,8 @@ if [ ! -f "$HTML_FILE" ]; then
     sed -i "s/let nodePort = 0;/let nodePort = $PORT;/" "$HTML_FILE"
     sed -i "s/let fileName = \"help\";/let fileName = \"$FILENAME\";/" "$HTML_FILE"
 else
-    # Update the node port and file name in the existing html file
-    sed -i "s/let nodePort = [0-9]*;/let nodePort = $PORT;/" "$HTML_FILE"
-    sed -i "s/let fileName = \".*\";/let fileName = \"$FILENAME\";/" "$HTML_FILE"
+    # HTML file already exists — do not overwrite or modify it
+    :
 fi
 
 if [ ! -f "$SAVER_JS_FILE" ]; then

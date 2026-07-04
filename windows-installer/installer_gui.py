@@ -203,17 +203,12 @@ class ScribbolethInstaller:
         html_file = target_dir / f"{filename}.html"
         saver_file = target_dir / f"svr_{filename}.js"
 
-        # Check if already exists
-        if html_file.exists() and saver_file.exists():
+        # Check if saver.js already exists (full installation already present)
+        if saver_file.exists():
             messagebox.showerror("Error", f"Installation for {filename} already exists")
             return
 
         self.log_install(f"Installing {filename} in {target_dir}")
-
-        # Determine port
-        port = self.get_next_port()
-        self.port_var.set(str(port))
-        self.log_install(f"Using port {port}")
 
         try:
             # Check for Node.js and npm
@@ -229,17 +224,29 @@ class ScribbolethInstaller:
             # Create target directory
             target_dir.mkdir(parents=True, exist_ok=True)
 
-            # Copy and modify HTML file
-            src_html = self.base_dir / "scribboleth.html"
-            if not src_html.exists():
-                messagebox.showerror("Error", f"scribboleth.html not found in {self.base_dir}")
-                return
+            # Determine port: read from existing html or get a new one
+            if html_file.exists():
+                html_content = html_file.read_text()
+                port_match = re.search(r'let nodePort = (\d+);', html_content)
+                port = int(port_match.group(1)) if port_match else self.get_next_port()
+                self.log_install(f"Existing HTML found, using port {port}")
+            else:
+                port = self.get_next_port()
+                self.log_install(f"Using port {port}")
 
-            html_content = src_html.read_text()
-            html_content = re.sub(r'let nodePort = \d+;', f'let nodePort = {port};', html_content)
-            html_content = re.sub(r'let fileName = ".*?";', f'let fileName = "{filename}";', html_content)
-            html_file.write_text(html_content)
-            self.log_install(f"Created {html_file}")
+                # Copy and modify HTML file (only if it doesn't already exist)
+                src_html = self.base_dir / "scribboleth.html"
+                if not src_html.exists():
+                    messagebox.showerror("Error", f"scribboleth.html not found in {self.base_dir}")
+                    return
+
+                html_content = src_html.read_text()
+                html_content = re.sub(r'let nodePort = \d+;', f'let nodePort = {port};', html_content)
+                html_content = re.sub(r'let fileName = ".*?";', f'let fileName = "{filename}";', html_content)
+                html_file.write_text(html_content)
+                self.log_install(f"Created {html_file}")
+
+            self.port_var.set(str(port))
 
             # Copy and modify saver.js
             src_saver = self.base_dir / "saver.js"
