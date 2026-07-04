@@ -30,27 +30,30 @@ set "SAVER_JS_FILE=%TARGET_DIR%\svr_%FILENAME%.js"
 REM Ensure target directory exists
 if not exist "%TARGET_DIR%" mkdir "%TARGET_DIR%"
 
-if exist "%HTML_FILE%" (
-  if exist "%SAVER_JS_FILE%" (
-    echo "Installation for %FILENAME% in %TARGET_DIR% already exists. Aborting."
-    exit /b 0
-  )
+if exist "%SAVER_JS_FILE%" (
+  echo "Installation for %FILENAME% in %TARGET_DIR% already exists. Aborting."
+  exit /b 0
 )
 
-REM Determine the next available port
-set "PORT=3000"
-set "LAST_PORT="
-if exist "%SCRNODES_BAT%" (
-    for /f "tokens=2" %%i in ('findstr /r "^REM [0-9][0-9]*" "%SCRNODES_BAT%"') do set "LAST_PORT=%%i"
-    if not defined LAST_PORT (
-        for /f "tokens=2 delims=:" %%i in ('findstr /r "echo.*:[0-9]*" "%SCRNODES_BAT%"') do (
-            set "LAST_PORT=%%i"
-            set "LAST_PORT=!LAST_PORT: =!"
+REM If HTML file already exists, read its existing port; otherwise find next available
+if exist "%HTML_FILE%" (
+    for /f "tokens=*" %%i in ('powershell -Command "(Get-Content -Path '%HTML_FILE%') -match 'let nodePort = (\d+);' | ForEach-Object { [regex]::Match($_, 'let nodePort = (\d+);').Groups[1].Value }"') do set "PORT=%%i"
+    if not defined PORT set "PORT=3000"
+) else (
+    set "PORT=3000"
+    set "LAST_PORT="
+    if exist "%SCRNODES_BAT%" (
+        for /f "tokens=2" %%i in ('findstr /r "^REM [0-9][0-9]*" "%SCRNODES_BAT%"') do set "LAST_PORT=%%i"
+        if not defined LAST_PORT (
+            for /f "tokens=2 delims=:" %%i in ('findstr /r "echo.*:[0-9]*" "%SCRNODES_BAT%"') do (
+                set "LAST_PORT=%%i"
+                set "LAST_PORT=!LAST_PORT: =!"
+            )
         )
-    )
-    if defined LAST_PORT (
-        set /a "PORT=LAST_PORT + 1" 2>nul
-        if errorlevel 1 set "PORT=3000"
+        if defined LAST_PORT (
+            set /a "PORT=LAST_PORT + 1" 2>nul
+            if errorlevel 1 set "PORT=3000"
+        )
     )
 )
 
@@ -164,9 +167,7 @@ if not exist "%HTML_FILE%" (
     powershell -Command "(Get-Content -path '%HTML_FILE%') -replace 'let nodePort = 0;', 'let nodePort = %PORT%;' | Set-Content -path '%HTML_FILE%'"
     powershell -Command "(Get-Content -path '%HTML_FILE%') -replace 'let fileName = \"help\";', 'let fileName = \"%FILENAME%\";' | Set-Content -path '%HTML_FILE%'"
 ) else (
-    REM Update the node port and file name in the existing html file
-    powershell -Command "(Get-Content -path '%HTML_FILE%') -replace 'let nodePort = [0-9]*;', 'let nodePort = %PORT%;' | Set-Content -path '%HTML_FILE%'"
-    powershell -Command "(Get-Content -path '%HTML_FILE%') -replace 'let fileName = \".*\";', 'let fileName = \"%FILENAME%\";' | Set-Content -path '%HTML_FILE%'"
+    REM HTML file already exists — do not overwrite or modify it
 )
 
 if not exist "%SAVER_JS_FILE%" (

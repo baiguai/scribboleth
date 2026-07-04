@@ -52,8 +52,6 @@ cd "$SCRIPT_DIR"
 echo "Copying files..."
 cp "$BASE_DIR/scribboleth.html" .
 cp "$BASE_DIR/saver.js" .
-cp "$BASE_DIR/installer.bat" .
-cp "$BASE_DIR/uninstaller.bat" .
 
 # Run PyInstaller through Wine
 echo "Building Windows executable..."
@@ -62,10 +60,15 @@ wine "$PYTHON_EXE" -m PyInstaller --onefile --windowed --name "ScribbolethInstal
 # Check if build succeeded
 if [ -f "dist/ScribbolethInstaller.exe" ]; then
     echo
+    echo "Copying support files to dist/..."
+    cp "$BASE_DIR/scribboleth.html" dist/
+    cp "$BASE_DIR/saver.js" dist/
+
     echo "=== Build Complete! ==="
     echo "Executable: $(pwd)/dist/ScribbolethInstaller.exe"
+    echo "Support files: $(pwd)/dist/scribboleth.html, $(pwd)/dist/saver.js"
     echo
-    echo "You can distribute ScribbolethInstaller.exe - it includes everything needed."
+    echo "You can distribute the entire dist/ folder."
 else
     echo "Build failed. Check the output above."
     exit 1
