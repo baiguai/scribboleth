@@ -2378,6 +2378,16 @@
                             saveViaNode();
                             performed = true;
                             break;
+                        case 'p':
+                            performed = true;
+                            navigator.clipboard.readText().then(text => {
+                                recordUndoState();
+                                const pos = editorArea.selectionStart;
+                                editorArea.setRangeText(text, pos, editorArea.selectionEnd, 'end');
+                                editorArea.selectionStart = editorArea.selectionEnd = pos + text.length;
+                                syncFile();
+                            }).catch(() => showMessage("Clipboard read failed"));
+                            break;
                         case 'q':
                             if (macro_playing) break;
                             if (macro_recording) {
