@@ -913,6 +913,13 @@
             let visual_end = 0;
             let vim_clipboard = '';
             let mode_replacing = false;
+            let macros = {};
+            let macro_recording = false;
+            let macro_recording_key = '';
+            let macro_buffer = [];
+            let macro_waiting_letter = false;
+            let macro_waiting_playback_letter = false;
+            let macro_playing = false;
 
             let undoStack = [];
             let redoStack = [];
@@ -2041,6 +2048,34 @@
                         return;
                     }
 
+                    if (macro_waiting_letter) {
+                        e.preventDefault();
+                        const letter = e.key;
+                        macro_waiting_letter = false;
+                        if (/^[a-zA-Z]$/.test(letter)) {
+                            macro_recording_key = letter;
+                            macro_recording = true;
+                            macro_buffer = [];
+                            showMessage("Recording @" + letter);
+                        } else {
+                            showMessage("Invalid macro letter");
+                        }
+                        return;
+                    }
+
+                    if (macro_waiting_playback_letter) {
+                        e.preventDefault();
+                        const letter = e.key;
+                        macro_waiting_playback_letter = false;
+                        if (/^[a-zA-Z]$/.test(letter) && macros[letter]) {
+                            showMessage("Playing @" + letter);
+                            playMacro(letter);
+                        } else {
+                            showMessage("No macro @" + letter);
+                        }
+                        return;
+                    }
+
                     if (mode_replacing) {
                         const charToReplace = e.key;
                         if (charToReplace.length === 1) {
@@ -2338,6 +2373,31 @@
                             saveViaNode();
                             performed = true;
                             break;
+                        case 'q':
+                            if (macro_playing) break;
+                            if (macro_recording) {
+                                macro_recording = false;
+                                macro_buffer.pop();
+                                if (macro_buffer.length > 0) {
+                                    macros[macro_recording_key] = macro_buffer.slice();
+                                    showMessage("Recorded @" + macro_recording_key + " (" + macros[macro_recording_key].length + " keys)");
+                                } else {
+                                    showMessage("Empty macro @" + macro_recording_key);
+                                }
+                                macro_buffer = [];
+                            } else {
+                                macro_waiting_letter = true;
+                                showMessage("Macro letter:");
+                            }
+                            performed = true;
+                            break;
+                        case '@':
+                            if (!macro_recording && !macro_waiting_letter && !macro_playing) {
+                                macro_waiting_playback_letter = true;
+                                showMessage("Macro letter:");
+                                performed = true;
+                            }
+                            break;
                     }
                     //------------------------------------------------------------------
                 
@@ -2430,6 +2490,9 @@
 
             // ---- Editor Keys ----------------------------------------------------
                 editorArea.addEventListener('keydown', (e) => {
+                    if (macro_recording && !macro_playing) {
+                        macro_buffer.push(e.key);
+                    }
                     const start = editorArea.selectionStart;
                     const end = editorArea.selectionEnd;
                     const value = editorArea.value;
@@ -2510,6 +2573,21 @@
                     }
 
                     if (e.key === 'Escape') {
+                        if (macro_waiting_letter) {
+                            macro_waiting_letter = false;
+                            showMessage("Macro cancelled");
+                            e.preventDefault();
+                            e.stopPropagation();
+                            return;
+                        }
+                        if (macro_waiting_playback_letter) {
+                            macro_waiting_playback_letter = false;
+                            showMessage("Playback cancelled");
+                            e.preventDefault();
+                            e.stopPropagation();
+                            return;
+                        }
+
                         e.preventDefault();
                         e.stopPropagation();
                         syncFile();
@@ -2522,6 +2600,11 @@
                             exitVisualMode();
                             setVimMode(false);
                         } else {
+                            if (macro_recording) {
+                                macro_recording = false;
+                                macro_buffer = [];
+                                showMessage("Macro cancelled (tree mode)");
+                            }
                             editing = false;
                             editorArea.blur();
                             render();
@@ -2671,6 +2754,32 @@
                 modeEl.textContent = 'TREE';
                 editing = false;
                 mode_insert = false;
+            }
+
+            function playMacro(letter) {
+                const keys = macros[letter];
+                if (!keys || !keys.length || macro_playing) return;
+                macro_playing = true;
+                recordUndoState();
+                for (let i = 0; i < keys.length; i++) {
+                    const key = keys[i];
+                    if (!editing) break;
+                    if (mode_insert) {
+                        if (key === 'Escape' || key === 'Enter' || key === 'Tab') {
+                            editorArea.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+                        } else {
+                            const pos = editorArea.selectionStart;
+                            editorArea.setRangeText(key, pos, editorArea.selectionEnd, 'end');
+                            editorArea.selectionStart = editorArea.selectionEnd = pos + key.length;
+                            syncFile();
+                        }
+                    } else {
+                        editorArea.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+                    }
+                }
+                if (mode_insert) setVimMode(false);
+                macro_playing = false;
+                showMessage("Played @" + letter);
             }
 
             function setVimMode(insertMode) {
