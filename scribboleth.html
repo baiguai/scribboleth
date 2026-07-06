@@ -920,6 +920,7 @@
             let macro_waiting_letter = false;
             let macro_waiting_playback_letter = false;
             let macro_playing = false;
+            let macro_playback_count = 1;
 
             let undoStack = [];
             let redoStack = [];
@@ -2068,8 +2069,12 @@
                         const letter = e.key;
                         macro_waiting_playback_letter = false;
                         if (/^[a-zA-Z]$/.test(letter) && macros[letter]) {
-                            showMessage("Playing @" + letter);
-                            playMacro(letter);
+                            const count = macro_playback_count || 1;
+                            showMessage("Playing @" + letter + " x" + count);
+                            for (let c = 0; c < count; c++) {
+                                if (!editing) break;
+                                playMacro(letter);
+                            }
                         } else {
                             showMessage("No macro @" + letter);
                         }
@@ -2393,6 +2398,7 @@
                             break;
                         case '@':
                             if (!macro_recording && !macro_waiting_letter && !macro_playing) {
+                                macro_playback_count = mode_repeat;
                                 macro_waiting_playback_letter = true;
                                 showMessage("Macro letter:");
                                 performed = true;
@@ -2490,7 +2496,7 @@
 
             // ---- Editor Keys ----------------------------------------------------
                 editorArea.addEventListener('keydown', (e) => {
-                    if (macro_recording && !macro_playing) {
+                    if (macro_recording && !macro_playing && e.key !== 'Shift' && e.key !== 'Control' && e.key !== 'Alt' && e.key !== 'Meta') {
                         macro_buffer.push(e.key);
                     }
                     const start = editorArea.selectionStart;
