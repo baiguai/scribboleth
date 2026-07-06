@@ -2497,7 +2497,7 @@
             // ---- Editor Keys ----------------------------------------------------
                 editorArea.addEventListener('keydown', (e) => {
                     if (macro_recording && !macro_playing && e.key !== 'Shift' && e.key !== 'Control' && e.key !== 'Alt' && e.key !== 'Meta') {
-                        macro_buffer.push(e.key);
+                        macro_buffer.push({ key: e.key, ctrl: e.ctrlKey, alt: e.altKey, meta: e.metaKey, shift: e.shiftKey });
                     }
                     const start = editorArea.selectionStart;
                     const end = editorArea.selectionEnd;
@@ -2763,24 +2763,27 @@
             }
 
             function playMacro(letter) {
-                const keys = macros[letter];
-                if (!keys || !keys.length || macro_playing) return;
+                const raw = macros[letter];
+                if (!raw || !raw.length || macro_playing) return;
+                const keys = typeof raw[0] === 'string'
+                    ? raw.map(k => ({ key: k, ctrl: false, alt: false, meta: false, shift: false }))
+                    : raw;
                 macro_playing = true;
                 recordUndoState();
                 for (let i = 0; i < keys.length; i++) {
-                    const key = keys[i];
+                    const evt = keys[i];
                     if (!editing) break;
                     if (mode_insert) {
-                        if (key === 'Escape' || key === 'Enter' || key === 'Tab') {
-                            editorArea.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+                        if (evt.ctrl || evt.alt || evt.meta || evt.key === 'Escape' || evt.key === 'Enter' || evt.key === 'Tab') {
+                            editorArea.dispatchEvent(new KeyboardEvent('keydown', { key: evt.key, ctrlKey: evt.ctrl, altKey: evt.alt, metaKey: evt.meta, shiftKey: evt.shift, bubbles: true }));
                         } else {
                             const pos = editorArea.selectionStart;
-                            editorArea.setRangeText(key, pos, editorArea.selectionEnd, 'end');
-                            editorArea.selectionStart = editorArea.selectionEnd = pos + key.length;
+                            editorArea.setRangeText(evt.key, pos, editorArea.selectionEnd, 'end');
+                            editorArea.selectionStart = editorArea.selectionEnd = pos + evt.key.length;
                             syncFile();
                         }
                     } else {
-                        editorArea.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+                        editorArea.dispatchEvent(new KeyboardEvent('keydown', { key: evt.key, ctrlKey: evt.ctrl, altKey: evt.alt, metaKey: evt.meta, shiftKey: evt.shift, bubbles: true }));
                     }
                 }
                 if (mode_insert) setVimMode(false);
