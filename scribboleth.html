@@ -877,7 +877,7 @@
             let importedFileName = null;
 
             let fileName = "help";
-            let curVersion = "1.0.8"
+            let curVersion = "1.0.9"
             let showInitHelp = false;
             let headerTemplate = "__| ^*^ |__";
             let selectedId = null;
@@ -1652,30 +1652,26 @@
 
                 function handleUndoKey(e) {
                     if (!showingUndo) return;
+                    e.preventDefault();
+                    e.stopPropagation();
                     if (e.key === 'ArrowDown' || e.key === 'j') {
                         undoIndex = Math.min(undoIndex + 1, undoStack.length - 1);
                         renderUndoList();
-                        e.preventDefault();
                     } else if (e.key === 'ArrowUp' || e.key === 'k') {
                         undoIndex = Math.max(undoIndex - 1, 0);
                         renderUndoList();
-                        e.preventDefault();
                     } else if (e.key === 'g') {
                         undoIndex = 0;
                         renderUndoList();
-                        e.preventDefault();
                     } else if (e.key === 'G') {
                         undoIndex = Math.max(undoStack.length - 1, 0);
                         renderUndoList();
-                        e.preventDefault();
                     } else if (e.key === 'Enter') {
                         if (undoStack.length > 0) {
                             applyUndo(undoIndex);
                         }
-                        e.preventDefault();
                     } else if (e.key === 'Escape') {
                         closeUndoDialog();
-                        e.preventDefault();
                     }
                 }
 
@@ -1836,6 +1832,9 @@
                     openDialog = true;
                 }
                 if (historyDialog.style.display === "block") {
+                    openDialog = true;
+                }
+                if (undoDialog.style.display === "flex") {
                     openDialog = true;
                 }
                 if (saveAsDialog.style.display === "block") {
