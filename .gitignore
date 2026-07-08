@@ -3,3 +3,4 @@ package-lock.json
 backups/
 svr_scribboleth_help.js
 .aider*
+coder.db
