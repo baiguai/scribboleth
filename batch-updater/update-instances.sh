@@ -5,6 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONF="$SCRIPT_DIR/instances.conf"
 HELPER="$SCRIPT_DIR/update-helper.cjs"
 DEFAULT_TEMPLATE="$SCRIPT_DIR/../scribboleth.html"
+[ ! -f "$DEFAULT_TEMPLATE" ] && DEFAULT_TEMPLATE="$SCRIPT_DIR/scribboleth.html"
 TEMPLATE="${1:-$DEFAULT_TEMPLATE}"
 
 if [ ! -f "$CONF" ]; then

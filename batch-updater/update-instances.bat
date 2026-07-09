@@ -6,6 +6,7 @@ set "SCRIPT_DIR=%SCRIPT_DIR:~0,-1%"
 set "CONF=%SCRIPT_DIR%\instances.conf"
 set "HELPER=%SCRIPT_DIR%\update-helper.cjs"
 set "DEFAULT_TEMPLATE=%SCRIPT_DIR%\..\scribboleth.html"
+if not exist "%DEFAULT_TEMPLATE%" set "DEFAULT_TEMPLATE=%SCRIPT_DIR%\scribboleth.html"
 set "TEMPLATE=%~1"
 if "%TEMPLATE%"=="" set "TEMPLATE=%DEFAULT_TEMPLATE%"
 
