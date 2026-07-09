@@ -2339,7 +2339,7 @@
                     if (e.key !== 'g') {
                         mode_going = false;
                     }
-                    if (e.key !== 'd' && e.key !== 'w' && e.key !== 'W' && e.key !== 'b' && e.key !== 'B') {
+                    if (e.key !== 'd' && e.key !== 'w' && e.key !== 'W' && e.key !== 'b' && e.key !== 'B' && e.key !== 'i') {
                         mode_deleting = false;
                     }
                     if (mode_counting && isNaN(parseInt(e.key, 10))) {
@@ -2381,6 +2381,9 @@
                         case "S": openSaveAsDialog(); break;
 
                         case "i": // Enter insert mode
+                            if (mode_deleting) {
+                                break;
+                            }
                             if (mode_visual) {
                                 mode_select_in = true;
                                 e.preventDefault();
@@ -2646,6 +2649,7 @@
                     if (mode_select_in) {
                         mode_select_in = false;
                         if (e.key === 'w') {
+                            alert("is deleting: " + mode_deleting);
                             selectInnerWord();
                             keyPerformed();
                             return true;

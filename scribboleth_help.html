@@ -735,29 +735,29 @@
 
             <div class="search-dialog" id="searchDialog" style="display: none;">
                 <input id="searchInput" placeholder="Search... (# for tags, r: regex, +: words)" type="text">
-                <div class="search-results" id="searchList"><div class="selected">Other Options</div></div>
+                <div class="search-results" id="searchList"><div class="selected">Introduction</div><div>Upgrading Scribboleth</div><div>The Information Panel</div><div>Deleting Nodes</div><div>Adding Child Nodes</div><div>Adding Sibling Nodes</div><div>Moving Left and Right</div><div>Selecting 'Root' Node</div><div>Introduction to Expanding/Collapsing</div><div>Collapse All</div><div>Moving a Node Up</div><div>Moving a Node Left</div><div>Moving a Node Right</div><div>Linking to Other Nodes</div><div>Introduction to the Editor's VIM Keys</div><div>Selecting Text</div><div>Copying Text</div><div>Undo</div><div>Wrap Text</div><div>Tables</div><div>Find and Replace</div><div>Dialogs Introduction</div><div>Find / Replace</div><div>Introduction to Mobile Mode</div><div>Tree Functions in Mobile Mode</div><div>Bookmark a Node</div><div>Bookmark a Node (at line)</div><div>Access Bookmarks</div><div>Export Current Note</div><div>Using the Links Dialog</div><div>Easily Add Reference Links</div><div>The Key-Bindings Help Dialog</div><div>Editor Keys</div><div>Vim Keys Notes</div><div>New Features</div></div>
             </div>
 
             <div class="search-dialog" id="linkSearchDialog" style="display: none;">
                 <input id="linkSearchInput" placeholder="Search to insert link..." type="text">
-                <div class="search-results" id="linkSearchList"></div>
+                <div class="search-results" id="linkSearchList"><div>Renaming Nodes</div><div>Special Key Codes</div><div>Navigation</div><div>Find / Replace</div><div>Using the Installer Script</div><div>The Key-Bindings Help Dialog</div><div class="selected">Special Key Bindings</div></div>
             </div>
 
-            <div class="search-dialog" id="helpDialogUnified" style="display:none;">
+            <div class="search-dialog" id="helpDialogUnified" style="display: none;">
               <input id="helpFilter" type="text" placeholder="Filter help (Start with : to search keys only, !r for regex cheatsheet)...">
-              <div id="helpResults" class="search-results"></div>
+              <div id="helpResults" class="search-results"><div><b>h</b> <span class="dim">(VISUAL) - </span>Extend selection left</div><div><b>j</b> <span class="dim">(VISUAL) - </span>Extend selection down</div><div><b>k</b> <span class="dim">(VISUAL) - </span>Extend selection up</div><div><b>l</b> <span class="dim">(VISUAL) - </span>Extend selection right</div><div><b>d</b> <span class="dim">(VISUAL) - </span>Delete selection</div><div><b>x</b> <span class="dim">(VISUAL) - </span>Cut selection</div><div><b>y</b> <span class="dim">(VISUAL) - </span>Copy selection</div><div><b>j</b> <span class="dim">(TREE) - </span>Select the next tree node</div><div><b>k</b> <span class="dim">(TREE) - </span>Select the previous tree node</div><div><b>gg</b> <span class="dim">(TREE) - </span>Select first root tree node</div><div><b>G</b> <span class="dim">(TREE) - </span>Select last root tree node</div><div><b>Control+\</b> <span class="dim">(INSERT) - </span>Wrap selected text</div></div>
               <p><a href="https://scribboleth.infinityfreeapp.com/" target="_blank">Full Help System</a></p>
               <p style="margin-top:6px;">Press ESC to close.</p>
             </div>
 
             <div id="linksDialog" ondblclick="closeLinksDialog();" style="display: none;">
                 <h3>Links in Note</h3>
-                <div id="linksList"><a href="#" data-node-id="kqr4o4g3" class="selected">The Options Dialog</a></div>
+                <div id="linksList"><a href="#" data-node-id="v1wa901k" class="selected">Special Key Bindings</a></div>
             </div>
 
             <div id="marksDialog" style="display: none;">
                 <h3>Bookmarks</h3>
-                <div id="marksList"></div>
+                <div id="marksList"><br><table><tbody><tr style="background:var(--sel-bg);"><td>Bookmark a Node (at line) (Line 6)</td><td>/Bookmarks</td></tr></tbody></table></div>
                 <p>
                     <br>
                     Press Esc to close
@@ -766,7 +766,7 @@
                 </p>
             </div>
 
-            <div id="replaceDialog" style="display: none;">
+            <div id="replaceDialog" style="display: none; top: 15%; left: 5px; width: 230px;">
                 <h3>Find<span id="ttlReplace"> &amp; Replace<span></span></span></h3>
                 <label id="lblFind" for="searchText">Find</label>
                 <input id="searchText" type="text">
@@ -779,25 +779,29 @@
                     </div>
                 </div>
                 <div id="replaceResults">Replaced 1 occurrence(s).</div>
-                <div id="findResults" style="margin-top:10px; max-height:200px; overflow:auto; font-family:monospace; white-space:pre-wrap;"></div>
+                <div id="findResults" style="margin-top:10px; max-height:200px; overflow:auto; font-family:monospace; white-space:pre-wrap;"><div class="find-item" data-idx="0" style="cursor: pointer; padding: 2px; overflow: auto; font-size: 60%;">
+                                    ** <span class="find-highlight">Note</span> **
+                                   </div><div class="find-item" data-idx="1" style="cursor: pointer; padding: 2px; overflow: auto; font-size: 60%; background: var(--sel-bg);">
+                                    When you navigate to a different <span class="find-highlight">note</span> - the previous one's undo history is
+                                   </div></div>
             </div>
 
             <div id="historyDialog" style="display: none;">
                 <h3>History</h3>
                 <div class="history-content">
-                    <div id="historyList"></div>
+                    <div id="historyList"><div>Undo Dialog</div><div class="selected" style="background: var(--sel-bg);">Bookmark a Node</div><div>Access Bookmarks</div><div>Introduction to Bookmarks</div><div>Entering Mobile Mode</div><div>Introduction to Mobile Mode</div><div>Find / Replace</div><div>Search Dialog</div><div>Options Dialog</div><div>Bookmarks Dialog</div><div>Help Dialog</div><div>Dialogs Introduction</div><div>Tree Functions in Mobile Mode</div><div>Editor Vim Help</div><div>Upgrading Scribboleth</div><div>Installing Scribboleth</div><div>Introduction</div><div>Installer Application</div><div>About Scribboleth</div><div>Introduction to History</div><div>Using the Uninstaller Script</div><div>Using the Installer Script</div><div>Copy the Files</div><div>Configure the Saver File</div><div>Configure Your Notes File</div><div>Install Node and NPM</div><div>Benefits of Advanced Saving</div><div>Introduction to Advanced Saving</div><div>Tables</div><div>Wrap Text</div></div>
                 </div>
             </div>
 
             <div id="undoDialog" style="display: none;">
                 <h3>Undo History</h3>
-                <div id="undoPreview" class="undo-preview"></div>
+                <div id="undoPreview" class="undo-preview"><div class="">Upgrading Scribboleth</div><div class="">--------------------------------------------------------------------------------</div><div class="">&nbsp;</div><div class="">Upgrading Scribboleth is very straightforward. You can use the hotkey:</div><div class="">&nbsp;</div><div class="">U</div><div class="">&nbsp;</div><div class="">Capital 'U'. This will display a file picker. Simply select the Scribboleth</div><div class="">instance you wish to upgrade.</div><div class="">IF that instance is currently using the NodeJS auto-saving feature, an</div><div class="">auto-save is immediately triggered, and you are done upgrading.</div><div class="">&nbsp;</div><div class="">If the instance is NOT using auto-save, you can use the save as key-code:</div><div class="">&nbsp;</div><div class="">s</div><div class="">&nbsp;</div><div class="">Or even better, use a capital 's':</div><div class="">&nbsp;</div><div class="">S</div><div class="">&nbsp;</div><div class="">Scribboleth will automatically populate the Title and File Name for you.</div><div class="">Make any changes you need and hit Enter.</div></div>
                 <div class="undo-content">
-                    <div id="undoList"></div>
+                    <div id="undoList"><div class="selected">1. Upgrading Scribboleth</div><div>2. Upgrading Scribboleth</div><div>3. Upgrading Scribboleth</div></div>
                 </div>
             </div>
 
-            <div id="saveAsDialog" style="display:none;">
+            <div id="saveAsDialog" style="display: none;">
                 <h3>Save As</h3>
                 <label>Title<br>
                     <input id="saveAsTitle" type="text" style="width:100%; background:var(--input-bg); color:var(--input-fg); border:1px solid var(--border); margin-bottom:10px;">
@@ -808,9 +812,9 @@
                 <p style="color:var(--dim); font-size:0.9em;">Press Enter to save, Esc to cancel.</p>
             </div>
 
-            <div id="versionDialog" class="search-dialog" style="display:none;width:300px;max-width:90vw;">
+            <div id="versionDialog" class="search-dialog" style="display: none; width: 300px; max-width: 90vw;">
                 <h3>Version</h3>
-                <p>Current Version: <span id="versionNumber"></span></p>
+                <p>Current Version: <span id="versionNumber">1.0.9</span></p>
             </div>
 
             <div id="themePickerDialog" class="search-dialog" style="display:none;width:350px;max-width:90vw;">
@@ -820,7 +824,7 @@
             </div>
 
 
-            <aside class="tree" id="tree" onclick="closeDialogs(); activateTree();"><ul><li><div class="node selected"><span class="twisty"><svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="1" fill="currentColor"></circle></svg></span><span class="title">Introduction</span></div></li><li><div class="node"><span class="twisty"><svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="1" fill="currentColor"></circle></svg></span><span class="title">Installing Scribboleth</span></div></li><li><div class="node"><span class="twisty"><svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="1" fill="currentColor"></circle></svg></span><span class="title">Upgrading Scribboleth</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">The Interface</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Bookmarks</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">History</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Pinned Clips</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Saving</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Configuration</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Linking</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Keys</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">About</span></div></li></ul></aside>
+            <aside class="tree" id="tree" onclick="closeDialogs(); activateTree();"><ul><li><div class="node selected"><span class="twisty"><svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="1" fill="currentColor"></circle></svg></span><span class="title">Introduction</span></div></li><li><div class="node"><span class="twisty"><svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="1" fill="currentColor"></circle></svg></span><span class="title">Installing Scribboleth</span></div></li><li><div class="node"><span class="twisty"><svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="1" fill="currentColor"></circle></svg></span><span class="title">Upgrading Scribboleth</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">The Interface</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Bookmarks</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">History</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Saving</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Configuration</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Linking</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Keys</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">About</span></div></li></ul></aside>
             <section class="editor">
                 <div id="statusBar" class="status" onclick="closeDialogs();" ondblclick="toggleMobileMenu();" title="Double click to toggle Mobile Mode">
                     <span class="pill" id="mode" style="display: block;">TREE</span>
@@ -828,7 +832,7 @@
                     <span class="dim" id="path">/</span>
                     <span class="pill" id="msg"></span>
                 </div>
-                <textarea id="editorArea" spellcheck="false" readonly="readonly" class=""></textarea>
+                <textarea id="editorArea" spellcheck="false" class="" readonly="readonly"></textarea>
             </section>
             </div>
 
@@ -862,7 +866,7 @@
   {
     "id": "dql0lz6i",
     "title": "Upgrading Scribboleth",
-    "content": "Upgrading Scribboleth\n--------------------------------------------------------------------------------\n\nUpgrading Scribboleth is very straightforward. You can use the hotkey:\n\nU\n\nCapital 'U'. This will display a file picker. Simply select the Scribboleth\ninstance you wish to upgrade.\nIF that instance is currently using the NodeJS auto-saving feature, an\nauto-save is immediately triggered, and you are done upgrading.\n\nIf the instance is NOT using auto-save, you can use the save as key-code:\n\nS\n\nScribboleth will automatically populate the Title and File Name for you.\nMake any changes you need and hit Enter.",
+    "content": "Upgrading Scribboleth\n--------------------------------------------------------------------------------\n\nUpgrading Scribboleth is very straightforward. You can use the hotkey:\n\nU\n\nCapital 'U'. This will display a file picker. Simply select the Scribboleth\ninstance you wish to upgrade.\nIF that instance is currently using the NodeJS auto-saving feature, an\nauto-save is immediately triggered, and you are done upgrading.\n\nIf the instance is NOT using auto-save, you can use the save as key-code:\n\ns\n\nScribboleth will automatically populate the Title and File Name for you.\nMake any changes you need and hit Enter.\n\nOr even better, use a capital 's':\n\nS\n\nThis allows you to choose the title and file name for the saved file.\nSee: _Save As_",
     "children": [],
     "expanded": false
   },
@@ -1228,9 +1232,9 @@
                 "expanded": false
               },
               {
-                "id": "pwffvhl8",
-                "title": "Editor Vim Help",
-                "content": "Editor Vim Help\n--------------------------------------------------------------------------------\n\nKey Binding: V\n\nThis help dialog is only available if Vim mode is enabled.\nTo set this setting, you will need to open the options dialog:\n\n_The Options Dialog_",
+                "id": "8vp5moyj",
+                "title": "Bookmarks Dialog",
+                "content": "Bookmarks Dialog\n--------------------------------------------------------------------------------\n\nTo see details on bookmarking and accessing stored bookmarks:\n\n_Introduction to Bookmarks_",
                 "children": [],
                 "expanded": false
               },
@@ -1256,9 +1260,9 @@
                 "expanded": false
               },
               {
-                "id": "8vp5moyj",
-                "title": "Bookmarks Dialog",
-                "content": "Bookmarks Dialog\n--------------------------------------------------------------------------------\n\nTo see details on bookmarking and accessing stored bookmarks:\n\n_Introduction to Bookmarks_",
+                "id": "w4blkbst",
+                "title": "Undo Dialog",
+                "content": "Undo Dialog\n--------------------------------------------------------------------------------\n\nKey Binding: u\n\nWhen in NORMAL mode, you can press 'u' to display the undo dialog. It will allow\nyou to navigate through the changes you have made to the current node since you\nhave navigated to it.\n\n** Note **\nWhen you navigate to a different node - the previous one's undo history is\ncleared out.\n",
                 "children": [],
                 "expanded": false
               }
@@ -1327,6 +1331,13 @@
         "expanded": false
       },
       {
+        "id": "qbmsifkq",
+        "title": "Bookmark a Node (at line)",
+        "content": "Bookmark a Node (at line)\n--------------------------------------------------------------------------------\n\nKey Binding: M\n\nBy using this key, while in NORMAL mode, the currently selected node will be\nadded to your list of bookmarks - at the line you are currently on.",
+        "children": [],
+        "expanded": false
+      },
+      {
         "id": "3c3z29o0",
         "title": "Access Bookmarks",
         "content": "Access Bookmarks\n--------------------------------------------------------------------------------\n\nKey Binding: `\n\nUsing this key will display the list of saved bookmarks so that you can\nselect one to navigate to.",
@@ -1345,21 +1356,6 @@
         "id": "j9kn2t3z",
         "title": "Introduction to History",
         "content": "Introduction to History\n--------------------------------------------------------------------------------\n\nEvery time you view a note node in Scribboleth it is added to a history list. This\nlist is persistent when you save your notes, however it is NOT stored when you\nare doing a 'save as'. To access historical notes use the key-binding:\n\n<",
-        "children": [],
-        "expanded": false
-      }
-    ],
-    "expanded": false
-  },
-  {
-    "id": "dnqd3fom",
-    "title": "Pinned Clips",
-    "content": "",
-    "children": [
-      {
-        "id": "2sc3y3ue",
-        "title": "Introduction to Pinning Clips",
-        "content": "Introduction to Pinning Clips\n--------------------------------------------------------------------------------\n\nIf there are clips that you may need to access often, but they aren't ones that\nyou necessarily need to keep around long term, you can pin them.\n\nTo pin a clip use:\n\np\n\nTo view your pinned clips use:\n\n'",
         "children": [],
         "expanded": false
       }
@@ -1439,7 +1435,7 @@
                   {
                     "id": "cdceziw7",
                     "title": "Installer Application",
-                    "content": "Installer Application\n\n\nFor Windows, there's an .exe in the Scribboleth repro you can use.\nSimply run the:\n\nScribbolethInstaller.exe\n\nThis tool will allow you to install or uninstall Scribboleth instances.\n\n\n\n\n__| Note |__\nThis tool was written in Python - so you can look at its source code in:\n~/scribboleth/windows-installer",
+                    "content": "Installer Application\n\n\nFor Windows, there's an .exe in the Scribboleth repro you can use.\nSimply run the:\n\nScribbolethInstaller.exe\n\nThis tool will allow you to install or uninstall Scribboleth instances.\n\n\n\n\n** Note **\nThis tool was written in Python - so you can look at its source code in:\n~/scribboleth/windows-installer",
                     "children": [],
                     "expanded": false
                   }
@@ -1578,7 +1574,7 @@
       {
         "id": "p7e36s9k",
         "title": "The Key-Bindings Help Dialog",
-        "content": "The Key-Bindings Help Dialog\n--------------------------------------------------------------------------------\n\nSince Scribboleth is fully keyboard-driven, for those who are learning how to use\nit, the keys help/lookup is VERY useful. To access this tool, simply use:\n\n?\n\nWhen you do, a filter-able list of all the keys will be displayed in a grid.\nThe first column is the key-code itself. The second column is the mode you must\nbe in to use the key. And the third column is a description of the key-binding.",
+        "content": "The Key-Bindings Help Dialog\n--------------------------------------------------------------------------------\n\nSince Scribboleth is fully keyboard-driven, for those who are learning how to use\nit, the keys help/lookup is VERY useful. To access this tool, simply use:\n\n?\n\nWhen you do, a filter-able list of all the keys will be displayed in a grid.\nThe first column is the key-code itself. The second column is the mode you must\nbe in to use the key. And the third column is a description of the key-binding.\n\nThere are some special bindings that do not show in this dialog.\nSee:  _Special Key Bindings_",
         "children": [],
         "expanded": false
       },
@@ -1599,8 +1595,16 @@
       {
         "id": "si1l1krb",
         "title": "Vim Keys Notes",
-        "content": "Vim Keys Notes\n--------------------------------------------------------------------------------\n\nPasting\n    Due to Scribboleth being an .html file, pasting CAN be done from the NORMAL mode,\n    however the browser will likely ask you before doing so. A quicker and \n    smoother work flow is to just enter INSERT mode and use Ctrl+V.\n\nSelection\n    There are a lot of Vim-style keys for selecting text, however currently\n    copying or cutting methods aren't 100% complete. So if you are using Vim\n    keys to select text, when you go to cut or copy the selected text, you will\n    want to enter INSERT mode and use Ctrl+C or Ctrl+X.\n\nUndo\n    Undo in Scribboleth is possible, however it will simply revert the note text to\n    what it was when the tree node was last selected. However you can manually\n    update that snapshot at any time. See: _Undo_",
-        "children": [],
+        "content": "Vim Keys Notes\n--------------------------------------------------------------------------------\n\nPasting\n    Due to Scribboleth being an .html file, pasting CAN be done from the NORMAL mode,\n    however the browser will likely ask you before doing so. A quicker and \n    smoother work flow is to just enter INSERT mode and use Ctrl+V.\n\nSelection\n    There are a lot of Vim-style keys for selecting text, however currently\n    copying or cutting methods aren't 100% complete. So if you are using Vim\n    keys to select text, when you go to cut or copy the selected text, you will\n    want to enter INSERT mode and use Ctrl+C or Ctrl+X.\n",
+        "children": [
+          {
+            "id": "v1wa901k",
+            "title": "Special Key Bindings",
+            "content": "Special Key Bindings\n--------------------------------------------------------------------------------\n\nThere are some special Vim style key bindings that Scribboleth can do.\nIn time I would like to add more, and will note them here. Presently these\nare NOT listed in the key bindings help.\n\nSelect in word:\n\n+--------+-------+---------------------------------------------------------+\n| Mode   | Keys  | Description                                             |\n+--------+-------+---------------------------------------------------------+\n| NORMAL | v,i,w | Selects the word the cursor is currently positioned on. |\n+--------+-------+---------------------------------------------------------+\n",
+            "children": [],
+            "expanded": false
+          }
+        ],
         "expanded": false
       }
     ],
@@ -1647,24 +1651,20 @@
             let bookmarks = [];
             let historyStack = [
     {
-        "id": "2sc3y3ue",
-        "title": "Introduction to Pinning Clips"
+        "id": "cdceziw7",
+        "title": "Installer Application"
     },
     {
-        "id": "i4wn04ar",
-        "title": "Introduction to Saving"
+        "id": "5d37h8fj",
+        "title": "Copy the Files"
     },
     {
-        "id": "8tu8ax56",
-        "title": "Using the Links Dialog"
+        "id": "v3j26vjt",
+        "title": "Persistent Settings"
     },
     {
-        "id": "mn1y8eig",
-        "title": "Linking to Other Nodes"
-    },
-    {
-        "id": "z6ijgy5i",
-        "title": "Easily Add Reference Links"
+        "id": "swspph0r",
+        "title": "Save"
     },
     {
         "id": "3k7huuk6",
@@ -1675,64 +1675,96 @@
         "title": "Export Current Branch"
     },
     {
-        "id": "uf47yk0u",
-        "title": "Wrap Text"
+        "id": "hqnkran9",
+        "title": "Help Dialog"
     },
     {
-        "id": "e1ehbevm",
-        "title": "Tables"
+        "id": "w4blkbst",
+        "title": "Undo Dialog"
     },
     {
-        "id": "bdc6h40i",
-        "title": "Introduction to Advanced Saving"
+        "id": "xxlrwvue",
+        "title": "Find / Replace"
     },
     {
-        "id": "ku2n5fi2",
-        "title": "Benefits of Advanced Saving"
+        "id": "8vp5moyj",
+        "title": "Bookmarks Dialog"
     },
     {
-        "id": "w4p132r1",
-        "title": "Install Node and NPM"
+        "id": "ihapjdt3",
+        "title": "Options Dialog"
     },
     {
-        "id": "yk6xanp6",
-        "title": "Configure Your Notes File"
+        "id": "820u4xbw",
+        "title": "Search Dialog"
     },
     {
-        "id": "rvisihmz",
-        "title": "Configure the Saver File"
+        "id": "8ai88uwz",
+        "title": "Dialogs Introduction"
     },
     {
-        "id": "5d37h8fj",
-        "title": "Copy the Files"
+        "id": "uktkqftz",
+        "title": "Save As"
     },
     {
-        "id": "uirc0zcu",
-        "title": "Using the Installer Script"
+        "id": "zaxs1bxd",
+        "title": "Introduction to Configuration"
     },
     {
-        "id": "hd35ryai",
-        "title": "Using the Uninstaller Script"
+        "id": "f08x2x2x",
+        "title": "Read Only Mode"
     },
     {
-        "id": "j9kn2t3z",
-        "title": "Introduction to History"
+        "id": "kqr4o4g3",
+        "title": "The Options Dialog"
     },
     {
-        "id": "dql0lz6i",
-        "title": "Upgrading Scribboleth"
+        "id": "8tu8ax56",
+        "title": "Using the Links Dialog"
     },
     {
-        "id": "wwyj1tyj",
-        "title": "Installing Scribboleth"
+        "id": "z6ijgy5i",
+        "title": "Easily Add Reference Links"
     },
     {
         "id": "ws3qw26g",
         "title": "About Scribboleth"
     },
     {
-        "id": "cdceziw7",
-        "title": "Installer Application"
+        "id": "e1ehbevm",
+        "title": "Tables"
+    },
+    {
+        "id": "uf47yk0u",
+        "title": "Wrap Text"
+    },
+    {
+        "id": "wwyj1tyj",
+        "title": "Installing Scribboleth"
+    },
+    {
+        "id": "dql0lz6i",
+        "title": "Upgrading Scribboleth"
+    },
+    {
+        "id": "si1l1krb",
+        "title": "Vim Keys Notes"
+    },
+    {
+        "id": "3wfayfnl",
+        "title": "Treeview Keys"
+    },
+    {
+        "id": "jqfch1d0",
+        "title": "Editor Keys"
+    },
+    {
+        "id": "p7e36s9k",
+        "title": "The Key-Bindings Help Dialog"
+    },
+    {
+        "id": "v1wa901k",
+        "title": "Special Key Bindings"
     },
     {
         "id": "7tvrov2y",
