@@ -1214,6 +1214,8 @@
                     { key: "yy", mode: "NORMAL", description: "Copy current line" },
                     { key: "v", mode: "NORMAL", description: "Enter VISUAL mode" },
                     { key: "V", mode: "NORMAL", description: "Enter VISUAL LINE mode" },
+                    { key: "v,i,w", mode: "NORMAL", description: "Select the word at cursor" },
+                    { key: "d,i,w", mode: "NORMAL", description: "Delete the word at cursor" },
                     { key: "Escape", mode: "VISUAL", description: "Exit to NORMAL mode" },
                     { key: "h", mode: "VISUAL", description: "Extend selection left" },
                     { key: "j", mode: "VISUAL", description: "Extend selection down" },
@@ -2339,8 +2341,9 @@
                     if (e.key !== 'g') {
                         mode_going = false;
                     }
-                    if (e.key !== 'd' && e.key !== 'w' && e.key !== 'W' && e.key !== 'b' && e.key !== 'B') {
+                    if (e.key !== 'd' && e.key !== 'w' && e.key !== 'W' && e.key !== 'b' && e.key !== 'B' && e.key !== 'i') {
                         mode_deleting = false;
+                        mode_select_in = false;
                     }
                     if (mode_counting && isNaN(parseInt(e.key, 10))) {
                         mode_counting = false;
@@ -2380,7 +2383,12 @@
                         case "s": saveAsHtml(fileName); break;
                         case "S": openSaveAsDialog(); break;
 
-                        case "i": // Enter insert mode
+                        case "i": // Enter insert mode (or inner-text-object when deleting)
+                            if (mode_deleting) {
+                                mode_select_in = true;
+                                e.preventDefault();
+                                return;
+                            }
                             if (mode_visual) {
                                 mode_select_in = true;
                                 e.preventDefault();
@@ -2452,6 +2460,36 @@
                             performed = true;
                             break;
                         case "w": // Forward word(s)
+                            if (mode_deleting && mode_select_in) {
+                                recordUndoState();
+                                const text = editorArea.value;
+                                let cursorPos = editorArea.selectionStart;
+                                if (cursorPos < text.length) {
+                                    const charClass = (char) => {
+                                        if (!char || /\s/.test(char)) return 'space';
+                                        if (/\w/.test(char)) return 'word';
+                                        return 'other';
+                                    };
+                                    let startPos = cursorPos;
+                                    let curClass = charClass(text[cursorPos]);
+                                    if (curClass === 'space') {
+                                        while (startPos < text.length && charClass(text[startPos]) === 'space') startPos++;
+                                        if (startPos < text.length) curClass = charClass(text[startPos]);
+                                    } else {
+                                        while (startPos > 0 && charClass(text[startPos - 1]) === curClass) startPos--;
+                                    }
+                                    let endPos = startPos;
+                                    let wordClass = charClass(text[startPos]);
+                                    while (endPos < text.length && charClass(text[endPos]) === wordClass) endPos++;
+                                    editorArea.setRangeText("", startPos, endPos, "start");
+                                    editorArea.selectionStart = editorArea.selectionEnd = startPos;
+                                    syncFile();
+                                }
+                                mode_deleting = false;
+                                mode_select_in = false;
+                                performed = true;
+                                break;
+                            }
                             if (mode_deleting) {
                                 recordUndoState();
                                 const getNextWordPos = (currentPos) => {
@@ -2979,6 +3017,7 @@
                 mode_counting = false;
                 mode_going = false;
                 mode_deleting = false;
+                mode_select_in = false;
             }
 
             function activateTree() {
