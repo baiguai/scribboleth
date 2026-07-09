@@ -10,6 +10,10 @@ TEMPLATE="${1:-$DEFAULT_TEMPLATE}"
 
 if [ ! -f "$CONF" ]; then
     echo "instances.conf not found at $CONF"
+    echo ""
+    echo "Create it with one full path per line to each scribboleth .html file to upgrade:"
+    echo "/home/user/scrib1/notes.html"
+    echo "/home/user/scrib2/journal.html"
     exit 1
 fi
 

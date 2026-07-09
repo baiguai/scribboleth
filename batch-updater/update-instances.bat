@@ -12,6 +12,10 @@ if "%TEMPLATE%"=="" set "TEMPLATE=%DEFAULT_TEMPLATE%"
 
 if not exist "%CONF%" (
     echo instances.conf not found at %CONF%
+    echo.
+    echo Create it with one full path per line to each scribboleth .html file to upgrade:
+    echo   C:\path\to\scrib1\notes.html
+    echo   C:\path\to\scrib2\journal.html
     exit /b 1
 )
 
