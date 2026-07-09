@@ -4,3 +4,4 @@ backups/
 svr_scribboleth_help.js
 .aider*
 coder.db
+batch-updater/instances.conf
