@@ -4678,7 +4678,7 @@
                     // Save current theme
                     const latestTheme = currentTheme ? JSON.stringify(currentTheme, null, 4) : "null";
                     htmlContent = htmlContent.replace(
-                        /let\s+currentTheme\s*=\s*(null|\[[\s\S]*?\]);/,
+                        /let\s+currentTheme\s*=\s*(null|\{[\s\S]*?\});/,
                         "let currentTheme = " + latestTheme + ";"
                     );
 
