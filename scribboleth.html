@@ -749,7 +749,6 @@
               <input id="helpFilter" type="text" placeholder="Filter help (Start with : to search keys only, !r for regex cheatsheet)...">
               <div id="helpResults" class="search-results"></div>
               <p><a href="https://scribboleth.infinityfreeapp.com/" target="_blank">Full Help System</a></p>
-              <p style="margin-top:6px;">Press ESC to close.</p>
             </div>
 
             <div id="linksDialog" ondblclick="closeLinksDialog();" style="display: none;">
@@ -760,12 +759,6 @@
             <div id="marksDialog" style="display: none;">
                 <h3>Bookmarks</h3>
                 <div id="marksList"></div>
-                <p>
-                    <br>
-                    Press Esc to close
-                    <br>
-                    Press d to delete a bookmark
-                </p>
             </div>
 
             <div id="replaceDialog" style="display: none;">
@@ -888,7 +881,7 @@
             let themes = [
                 { name: "default-theme", bg: "#000000", fg: "#f5f5f5", muted: "#555555", accent: "#00d1b2", danger: "#ff5577", "sel-bg": "#111827", "btn-border": "#555555", border: "#222222", "input-bg": "#111827", "input-fg": "#f5f5f5", "btn-bg": "#111827", "btn-fg": "#f5f5f5", dim: "#555555", "border-radius": "8px", "pill-radius": "999px", "vim-cursor": "#00b894", "insert-cursor": "#00d1b2" },
                 { name: "default-with-grid", bg: "#000000", fg: "#c0c0c0", muted: "#404040", accent: "#00d1b2", danger: "#ff5577", "sel-bg": "#1a1a1a", "btn-border": "#333333", border: "#222222", "input-bg": "#111111", "input-fg": "#c0c0c0", "btn-bg": "#111111", "btn-fg": "#c0c0c0", dim: "#404040", "border-radius": "8px", "pill-radius": "999px", "vim-cursor": "#00b894", "insert-cursor": "#00d1b2", grid: true, "grid-color": "#111111" },
-                { name: "blued", bg: "#000000", fg: "#d5e5ff", muted: "#555555", accent: "#00d1b2", danger: "#ff5577", "sel-bg": "#111827", "btn-border": "#555555", border: "#222222", "input-bg": "#111827", "input-fg": "#d5e5ff", "btn-bg": "#111827", "btn-fg": "#d5e5ff", dim: "#555555", "border-radius": "8px", "pill-radius": "999px", "vim-cursor": "#1f4676", "insert-cursor": "#b8e3ff" },
+                { name: "blued", bg: "#000000", fg: "#d5e5ff", muted: "#555555", accent: "#00d1b2", danger: "#ff5577", "sel-bg": "#111827", "btn-border": "#555555", border: "#222222", "input-bg": "#111827", "input-fg": "#d5e5ff", "btn-bg": "#111827", "btn-fg": "#d5e5ff", dim: "#555555", "border-radius": "4px", "pill-radius": "0px", "vim-cursor": "#1f4676", "insert-cursor": "#b8e3ff" },
                 { name: "dim-console", bg: "#000000", fg: "#888888", muted: "#444444", accent: "#888888", danger: "#888888", "sel-bg": "#000000", "btn-border": "#333333", border: "#111111", "input-bg": "#000000", "input-fg": "#888888", "btn-bg": "#111111", "btn-fg": "#888888", dim: "#444444", "border-radius": "0px", "pill-radius": "0px", "vim-cursor": "#333333", "insert-cursor": "#888888" },
                 { name: "monokai-theme", bg: "#0f0f0f", fg: "#f0f0f0", muted: "#888888", accent: "#00bfff", danger: "#ff4444", "sel-bg": "#1a1a1a", "btn-border": "#666666", border: "#2a2a2a", "input-bg": "#1a1a1a", "input-fg": "#f0f0f0", "btn-bg": "#1a1a1a", "btn-fg": "#f0f0f0", dim: "#888888", "border-radius": "4px", "pill-radius": "4px", "vim-cursor": "#d0d0d0", "insert-cursor": "#00bfff" },
                 { name: "monokai-pro-theme", bg: "#2d2d2d", fg: "#f2f2e0", muted: "#727272", accent: "#ffa044", danger: "#ff6b6b", "sel-bg": "#3d3d3d", "btn-border": "#555555", border: "#494949", "input-bg": "#3d3d3d", "input-fg": "#f2f2e0", "btn-bg": "#3d3d3d", "btn-fg": "#f2f2e0", dim: "#727272", "border-radius": "4px", "pill-radius": "4px", "vim-cursor": "#f2f2e0", "insert-cursor": "#ffa044" },
@@ -5063,7 +5056,7 @@
                     // Save current theme
                     const latestTheme = currentTheme ? JSON.stringify(currentTheme, null, 4) : "null";
                     htmlContent = htmlContent.replace(
-                        /let\s+currentTheme\s*=\s*(null|\[[\s\S]*?\]);/,
+                        /let\s+currentTheme\s*=\s*(null|\{[\s\S]*?\});/,
                         "let currentTheme = " + latestTheme + ";"
                     );
 
