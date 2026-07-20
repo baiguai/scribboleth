@@ -661,6 +661,14 @@
                 ::-webkit-scrollbar-track { background: var(--bg); }
 
                 /* Grid backgrounds */
+
+                /* Theme Editor rows */
+                .te-row { display:flex; align-items:center; gap:8px; padding:3px 12px; cursor:pointer; user-select:none; }
+                .te-row:hover { background: var(--sel-bg); }
+                .te-row.te-selected { background: var(--sel-bg); outline: 1px dashed var(--border); }
+                .te-row.te-active .te-name { color: var(--accent); }
+                .te-row .te-active-dot { display:none; width:6px; height:6px; border-radius:50%; background:var(--accent); flex-shrink:0; }
+                .te-row.te-active .te-active-dot { display:inline-block; }
             </style>
 <!-- End Styles -->
 </head>
@@ -4922,10 +4930,12 @@
             function renderThemeEditorList() {
                 const list = document.getElementById('themeEditorList');
                 list.innerHTML = '';
+                const activeName = currentTheme ? currentTheme.name : null;
                 themes.forEach((theme, index) => {
                     const row = document.createElement('div');
-                    row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:3px 12px;cursor:pointer;user-select:none;';
-                    if (index === themeEditorIndex) row.classList.add('selected');
+                    row.className = 'te-row';
+                    if (index === themeEditorIndex) row.classList.add('te-selected');
+                    if (activeName && theme.name === activeName) row.classList.add('te-active');
 
                     const swatch = document.createElement('span');
                     swatch.style.cssText = 'display:inline-block;width:14px;height:14px;border-radius:3px;border:1px solid var(--btn-border);flex-shrink:0;';
@@ -4935,7 +4945,11 @@
                     inner.style.background = theme.accent || '#888';
                     swatch.appendChild(inner);
 
+                    const activeDot = document.createElement('span');
+                    activeDot.className = 'te-active-dot';
+
                     const name = document.createElement('span');
+                    name.className = 'te-name';
                     name.textContent = theme.name;
                     name.style.cssText = 'flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:0.9em;';
 
@@ -4950,6 +4964,7 @@
                     delBtn.onclick = (e) => { e.stopPropagation(); deleteThemeFromEditor(index); };
 
                     row.appendChild(swatch);
+                    row.appendChild(activeDot);
                     row.appendChild(name);
                     row.appendChild(editBtn);
                     row.appendChild(delBtn);
@@ -4957,7 +4972,7 @@
                     list.appendChild(row);
                 });
                 setTimeout(() => {
-                    const sel = list.querySelector('.selected');
+                    const sel = list.querySelector('.te-selected');
                     if (sel) sel.scrollIntoView({ block: 'nearest' });
                 }, 0);
             }
