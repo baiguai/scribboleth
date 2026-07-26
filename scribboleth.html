@@ -1225,6 +1225,7 @@
                     { key: "K", mode: "NORMAL", description: "Move current line up" },
                     { key: "l", mode: "NORMAL", description: "Move cursor right" },
                     { key: "w", mode: "NORMAL", description: "Move to next word" },
+                    { key: "e", mode: "NORMAL", description: "Move to end of word" },
                     { key: "b", mode: "NORMAL", description: "Move to previous word" },
                     { key: "0", mode: "NORMAL", description: "Move to start of line" },
                     { key: "$", mode: "NORMAL", description: "Move to end of line" },
@@ -1239,6 +1240,7 @@
                     { key: "O", mode: "NORMAL", description: "Open new line above" },
                     { key: "dd", mode: "NORMAL", description: "Delete current line" },
                     { key: "dw", mode: "NORMAL", description: "Delete word" },
+                    { key: "de", mode: "NORMAL", description: "Delete to end of word" },
                     { key: "x", mode: "NORMAL", description: "Delete character" },
                     { key: "p", mode: "NORMAL", description: "Paste after cursor" },
                     { key: "P", mode: "NORMAL", description: "Paste before cursor" },
@@ -1261,6 +1263,7 @@
                     { key: "k", mode: "VISUAL", description: "Extend selection up" },
                     { key: "l", mode: "VISUAL", description: "Extend selection right" },
                     { key: "w", mode: "VISUAL", description: "Extend to next word" },
+                    { key: "e", mode: "VISUAL", description: "Extend to end of word" },
                     { key: "b", mode: "VISUAL", description: "Extend to previous word" },
                     { key: "i", mode: "VISUAL", description: "Prepare for inner object (follow with w for word)" },
                     { key: "d", mode: "VISUAL", description: "Delete selection" },
@@ -2053,6 +2056,38 @@
                 }
             }
 
+            function moveSpace() {
+                const text = editorArea.value;
+                let pos;
+                let startPos;
+
+                if (mode_visual) {
+                    pos = visual_end;
+                } else {
+                    pos = editorArea.selectionStart;
+                }
+                startPos = pos;
+
+                if (pos < text.length) {
+                    if (/\s/.test(text[pos])) {
+                        while (pos < text.length && /\s/.test(text[pos])) pos++;
+                    }
+                    if (pos < text.length && !/\s/.test(text[pos])) {
+                        while (pos < text.length && !/\s/.test(text[pos])) pos++;
+                        // pos--;
+                    } else {
+                        pos = startPos;
+                    }
+                }
+
+                if (mode_visual) {
+                    visual_end = pos;
+                    updateVisualSelection();
+                } else {
+                    editorArea.selectionStart = editorArea.selectionEnd = pos;
+                }
+            }
+
             function moveToWordStart() {
                 if (mode_deleting) {
                     recordUndoState();
@@ -2357,7 +2392,7 @@
                     if (e.key !== 'g') {
                         mode_going = false;
                     }
-                    if (e.key !== 'd' && e.key !== 'w' && e.key !== 'W' && e.key !== 'b' && e.key !== 'B' && e.key !== 'i') {
+                    if (e.key !== 'd' && e.key !== 'w' && e.key !== 'W' && e.key !== 'b' && e.key !== 'B' && e.key !== 'i' && e.key !== 'e') {
                         mode_deleting = false;
                         mode_select_in = false;
                     }
@@ -2559,6 +2594,39 @@
                         case 'b': // Backward word(s)
                             moveToWordStart();
                             break;
+                        case 'e': // Forward to end of word(s)
+                            if (mode_deleting) {
+                                recordUndoState();
+                                const text = editorArea.value;
+                                let endPos = editorArea.selectionStart;
+
+                                for (let i = 0; i < mode_repeat; i++) {
+                                    if (endPos >= text.length) break;
+
+                                    let spaceEnd = endPos;
+                                    if (/\s/.test(text[endPos])) {
+                                        while (spaceEnd < text.length && /\s/.test(text[spaceEnd])) spaceEnd++;
+                                    }
+
+                                    if (spaceEnd < text.length && !/\s/.test(text[spaceEnd])) {
+                                        endPos = spaceEnd;
+                                        while (endPos < text.length && !/\s/.test(text[endPos])) endPos++;
+                                    } else {
+                                        break;
+                                    }
+                                }
+
+                                if (endPos > editorArea.selectionStart) {
+                                    editorArea.setRangeText("", editorArea.selectionStart, endPos, "start");
+                                    syncFile();
+                                }
+                                mode_deleting = false;
+                                performed = true;
+                            } else {
+                                for (let i = 0; i < mode_repeat; i++) moveSpace();
+                                performed = true;
+                            }
+                            break;
                         case 'x': // Delete character(s) under cursor
                             recordUndoState();
                             const start = editorArea.selectionStart;
@@ -2736,6 +2804,10 @@
                             return true;
                         case 'b':
                             for (let i = 0; i < mode_repeat; i++) moveWord(-1);
+                            keyPerformed();
+                            return true;
+                        case 'e':
+                            for (let i = 0; i < mode_repeat; i++) moveSpace();
                             keyPerformed();
                             return true;
                         case 'd': // Delete selection
