@@ -1529,19 +1529,49 @@
                     scheduleAutoSave();
                 });
 
-                editorArea.addEventListener('click', () => {
+                editorArea.addEventListener('click', (e) => {
                     if (!readOnly) {
-                        setVimMode(true); // This will set the correct cursor style
-                        editing = true;
-                        render();
+                        setVimMode(true);
+                        if (!editing) {
+                            editing = true;
+                            render();
+                        }
                     }
-
-                    // Close dialogs - this is for mobile envs
                     closeDialogs();
-
                     editorArea.focus();
-                    // editorArea.setSelectionRange(0, 0); 
-                    // scrollToCursor();
+                });
+
+                editorArea.addEventListener('dblclick', (e) => {
+                    if (readOnly) return;
+                    const cursorPos = editorArea.selectionStart;
+                    if (cursorPos < 0) return;
+                    const content = editorArea.value;
+                    const link = findLinkAtCursor(content, cursorPos);
+                    if (!link) return;
+                    e.preventDefault();
+                    if (link.type === 'url') {
+                        window.open(link.target, '_blank');
+                    } else if (link.type === 'note') {
+                        const title = link.title.toLowerCase();
+                        let foundNode = null;
+                        (function walk(nodes) {
+                            for (const n of nodes) {
+                                if (n.title && n.title.toLowerCase() === title) {
+                                    foundNode = n;
+                                    return;
+                                }
+                                if (n.children && n.children.length) walk(n.children);
+                                if (foundNode) return;
+                            }
+                        })(treeData);
+                        if (foundNode) {
+                            expandToNode(foundNode.id);
+                            selectedId = foundNode.id;
+                            editing = false;
+                            closeLinksDialog();
+                            render();
+                        }
+                    }
                 });
 
                 function syncFile() {
@@ -3749,6 +3779,40 @@
             }
 
         //---- Links -----------------------------------------------------------
+            function findLinkAtCursor(content, cursorPos) {
+                const markdownRegex = /\[([^\]]+)\](?:[ \t]*\r?\n[ \t]*|[ \t]*)(https?:\/\/\S+|file:\/\/\S+|_[^_]+_)/gi;
+                let match;
+                while ((match = markdownRegex.exec(content)) !== null) {
+                    if (cursorPos >= match.index && cursorPos <= match.index + match[0].length) {
+                        const target = match[2].trim();
+                        if (/^(https?|file):\/\//i.test(target)) {
+                            return { type: 'url', target };
+                        } else if (target.startsWith('_') && target.endsWith('_')) {
+                            return { type: 'note', title: target.slice(1, -1) };
+                        }
+                    }
+                }
+
+                const urlRegex = /\b(?:https?|file):\/\/[^\s]+/gi;
+                while ((match = urlRegex.exec(content)) !== null) {
+                    if (cursorPos >= match.index && cursorPos <= match.index + match[0].length) {
+                        return { type: 'url', target: match[0] };
+                    }
+                }
+
+                const noteRegex = /(?:^|\s|\()_([^_]|[^_].*?[^_])_(?=\s|[.,!?;:)]|$)/g;
+                while ((match = noteRegex.exec(content)) !== null) {
+                    const full = match[0];
+                    const start = match.index;
+                    const end = start + full.length;
+                    if (cursorPos >= start && cursorPos <= end) {
+                        return { type: 'note', title: match[1].trim() };
+                    }
+                }
+
+                return null;
+            }
+
             function openLinksDialog() {
                 showingLinks = true;
                 const info = findNodeAndParentById(selectedId);
