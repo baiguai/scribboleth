@@ -350,6 +350,36 @@
                     overflow-y: auto;
                     box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
                 }
+                #tagsDialog {
+                    display: none;
+                    position: fixed;
+                    top: 10%;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    width: 400px;
+                    max-width: 90vw;
+                    max-height: 70%;
+                    background: var(--bg);
+                    color: var(--fg);
+                    border: 2px solid var(--border);
+                    border-radius: var(--border-radius);
+                    padding: 20px;
+                    z-index: 9999;
+                    font-family: monospace;
+                    overflow-y: auto;
+                    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+                }
+                #tagsList div {
+                    padding: 5px 6px;
+                    font-size: 0.9rem;
+                    cursor: pointer;
+                }
+                #tagsList div.selected {
+                    background: var(--sel-bg);
+                }
+                #tagsDialog h3 {
+                    margin-top: 0;
+                }
                 #linksDialog h3 {
                     margin-top: 0;
                 }
@@ -743,12 +773,12 @@
 
             <div class="search-dialog" id="searchDialog" style="display: none;">
                 <input id="searchInput" placeholder="Search... (# for tags, r: regex, +: words)" type="text">
-                <div class="search-results" id="searchList"><div class="selected">Linking to Other Nodes</div><div>Export Current Note</div><div>Links</div><div>Using the Links Dialog</div><div>Easily Add Reference Links</div></div>
+                <div class="search-results" id="searchList"><div class="selected">Other Options</div></div>
             </div>
 
             <div class="search-dialog" id="linkSearchDialog" style="display: none;">
                 <input id="linkSearchInput" placeholder="Search to insert link..." type="text">
-                <div class="search-results" id="linkSearchList"><div class="selected">Linking to Other Nodes</div><div>Linking</div></div>
+                <div class="search-results" id="linkSearchList"></div>
             </div>
 
             <div class="search-dialog" id="helpDialogUnified" style="display:none;">
@@ -767,7 +797,13 @@
                 <div id="marksList"></div>
             </div>
 
-            <div id="replaceDialog" style="display: none; top: 15%; left: 5px; width: 230px;">
+            <div id="tagsDialog" style="display: none;">
+                <h3>Tags</h3>
+                <div id="tagsList"><div class="selected">#noexp</div></div>
+                <p style="color:var(--dim); font-size:0.9em; margin-bottom:0;">↑↓ j/k Navigate • Enter Insert • Esc Cancel</p>
+            </div>
+
+            <div id="replaceDialog" style="display: none;">
                 <h3>Find<span id="ttlReplace"> &amp; Replace<span></span></span></h3>
                 <label id="lblFind" for="searchText">Find</label>
                 <input id="searchText" type="text">
@@ -786,19 +822,19 @@
             <div id="historyDialog" style="display: none;">
                 <h3>History</h3>
                 <div class="history-content">
-                    <div id="historyList"><div>Linking to Other Nodes</div><div class="selected" style="background: var(--sel-bg);">Links</div><div>Introduction</div><div>Using the Links Dialog</div><div>Vim Keys Notes</div><div>Special Key Bindings</div><div>The Key-Bindings Help Dialog</div><div>Editor Keys</div><div>Treeview Keys</div><div>Upgrading Scribboleth</div><div>Installing Scribboleth</div><div>Wrap Text</div><div>Tables</div><div>About Scribboleth</div><div>Easily Add Reference Links</div><div>The Options Dialog</div><div>Read Only Mode</div><div>Introduction to Configuration</div><div>Save As</div><div>Dialogs Introduction</div><div>Search Dialog</div><div>Options Dialog</div><div>Bookmarks Dialog</div><div>Find / Replace</div><div>Undo Dialog</div><div>Help Dialog</div><div>Export Current Branch</div><div>Export Current Note</div><div>Save</div><div>Persistent Settings</div></div>
+                    <div id="historyList"></div>
                 </div>
             </div>
 
             <div id="undoDialog" style="display: none;">
                 <h3>Undo History</h3>
-                <div id="undoPreview" class="undo-preview"></div>
+                <div id="undoPreview" class="undo-preview"><div class="">Introduction</div><div class="">--------------------------------------------------------------------------------</div><div class="">&nbsp;</div><div class="">Scribboleth is a plain text editor that is a stand alone HTML file. It is fully</div><div class="">keyboard driven. To quickly access the key-bindings press: ?</div><div class="">&nbsp;</div><div class="">If you are familiar with Vim key-bindings you should find Scribboleth fairly</div><div class="">comfortable. However there is a mode that isn't in Vim - TREE. This mode</div><div class="">operates on the treeview. And not all bindings function the same as in Vim.</div><div class="">Be sure to consult the following topic:</div><div class="">&nbsp;</div><div class="">_Vim Keys Notes_</div><div class="">&nbsp;</div><div class="">Scribboleth was inspired by:</div><div class="">&nbsp;</div><div class="">[TiddlyWiki]</div><div class="">https://tiddlywiki.com/</div><div class="">&nbsp;</div><div class="">To read more, check out _About Scribboleth_</div><div class="">&nbsp;</div><div class="">Being a stand alone HTML file, saving doesn't behave as a typical application</div><div class="">would so be sure to consult the _Saving_ topic.</div><div class="">&nbsp;</div><div class="">&nbsp;</div><div class="">Compatibility</div><div class="">--------------------------------------------------------------------------------</div><div class="">&nbsp;</div><div class="">Being a stand alone HTML file, Scribboleth can be used on any device with a</div><div class="">Javascript-enabled web browser on it. However virtual keyboards (like those</div><div class="">found on mobile phones) may be problematic. This is because they are typically</div><div class="">only visible when a text field is selected - and because they generally lack</div><div class="">an escape key. However if you have a tablet with a physical keyboard, Scribboleth</div><div class="">SHOULD work fine for you.</div><div class="">&nbsp;</div><div class="">&nbsp;</div><div class="">Mobile Mode</div><div class="">--------------------------------------------------------------------------------</div><div class="">&nbsp;</div><div class="">If you are on a device that doesn't have a physical keyboard, you can still use</div><div class="">Scribboleth, however its functionality is limited. Refer to the following topics:</div><div class="">&nbsp;</div><div class="">_Introduction to Mobile Mode_</div><div class="">&nbsp;</div><div class="">&nbsp;</div><div class="">&nbsp;</div><div class="">&nbsp;</div></div>
                 <div class="undo-content">
-                    <div id="undoList"></div>
+                    <div id="undoList"><div class="selected">1. Introduction</div></div>
                 </div>
             </div>
 
-            <div id="saveAsDialog" style="display: none;">
+            <div id="saveAsDialog" style="display:none;">
                 <h3>Save As</h3>
                 <label>Title<br>
                     <input id="saveAsTitle" type="text" style="width:100%; background:var(--input-bg); color:var(--input-fg); border:1px solid var(--border); margin-bottom:10px;">
@@ -854,7 +890,7 @@
             </div>
             <input type="file" id="themeEditorFilePicker" accept=".json" style="display:none;">
 
-            <aside class="tree" id="tree" onclick="closeDialogs(); activateTree();"><ul><li><div class="node selected"><span class="twisty"><svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="1" fill="currentColor"></circle></svg></span><span class="title">Introduction</span></div></li><li><div class="node"><span class="twisty"><svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="1" fill="currentColor"></circle></svg></span><span class="title">Installing Scribboleth</span></div></li><li><div class="node"><span class="twisty"><svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="1" fill="currentColor"></circle></svg></span><span class="title">Upgrading Scribboleth</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">The Interface</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Bookmarks</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">History</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Saving</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Configuration</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Linking</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Keys</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">About</span></div></li></ul></aside>
+            <aside class="tree" id="tree" onclick="closeDialogs(); activateTree();"><ul><li><div class="node selected"><span class="twisty"><svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="1" fill="currentColor"></circle></svg></span><span class="title">Introduction</span></div></li><li><div class="node"><span class="twisty"><svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="1" fill="currentColor"></circle></svg></span><span class="title">Installing Scribboleth</span></div></li><li><div class="node"><span class="twisty"><svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="1" fill="currentColor"></circle></svg></span><span class="title">Upgrading Scribboleth</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">The Interface</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Bookmarks</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">History</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Saving</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Configuration</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Linking</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Keys</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M1 3 L5 7 L9 3 Z" fill="currentColor"></path></svg></span><span class="title">About</span></div><ul><li><div class="node"><span class="twisty"><svg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="1" fill="currentColor"></circle></svg></span><span class="title">About Scribboleth</span></div></li><li><div class="node"><span class="twisty"><svg width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M3 1 L7 5 L3 9 Z" fill="currentColor"></path></svg></span><span class="title">Upcoming</span></div></li></ul></li></ul></aside>
             <section class="editor">
                 <div id="statusBar" class="status" onclick="closeDialogs();" ondblclick="toggleMobileMenu();" title="Double click to toggle Mobile Mode">
                     <span class="pill" id="mode" style="display: block;">TREE</span>
@@ -1674,7 +1710,7 @@
         "expanded": false
       }
     ],
-    "expanded": false
+    "expanded": true
   }
 ];
             let bookmarks = [
@@ -1750,10 +1786,6 @@
         "title": "Easily Add Reference Links"
     },
     {
-        "id": "ws3qw26g",
-        "title": "About Scribboleth"
-    },
-    {
         "id": "e1ehbevm",
         "title": "Tables"
     },
@@ -1802,6 +1834,10 @@
         "title": "Linking to Other Nodes"
     },
     {
+        "id": "ws3qw26g",
+        "title": "About Scribboleth"
+    },
+    {
         "id": "7tvrov2y",
         "title": "Introduction"
     }
@@ -1840,6 +1876,9 @@
             let editing = false;
             let showingLinks = false;
             let showingMarks = false;
+            let showingTags = false;
+            let tagsList = [];
+            let tagsIndex = 0;
             let showingHelp = false;
             let currentTheme = null;
             let themes = [
@@ -2135,6 +2174,7 @@
                     { key: "Control+\\", mode: "INSERT", description: "Wrap selected text" },
                     { key: "Control+;", mode: "INSERT", description: "Create/Update table" },
                     { key: "Control+'", mode: "INSERT", description: "Insert Link" },
+                    { key: "Control+3", mode: "INSERT", description: "Show all tags dialog" },
                 ];
                 
                 let helpVimEnabled = [
@@ -2805,6 +2845,9 @@
                     openDialog = true;
                 }
                 if (marksDialog.style.display === "block") {
+                    openDialog = true;
+                }
+                if (document.getElementById('tagsDialog').style.display === "block") {
                     openDialog = true;
                 }
                 if (historyDialog.style.display === "block") {
@@ -5303,6 +5346,106 @@
                 showingMarks = false;
             }
 
+            function collectAllTags() {
+                const tagSet = new Set();
+                (function walk(nodes) {
+                    for (const n of nodes) {
+                        const content = n.content || '';
+                        const matches = content.match(/#[\w-]+/g) || [];
+                        for (const t of matches) {
+                            tagSet.add(t.toLowerCase());
+                        }
+                        if (n.children && n.children.length) walk(n.children);
+                    }
+                })(treeData);
+                return [...tagSet].sort();
+            }
+
+            function openTagsDialog() {
+                if (readOnly) return;
+                tagsList = collectAllTags();
+                if (tagsList.length === 0) {
+                    showMessage('No tags found');
+                    return;
+                }
+                tagsIndex = 0;
+                showingTags = true;
+                document.getElementById('tagsDialog').style.display = 'block';
+                renderTagsList();
+            }
+
+            function closeTagsDialog() {
+                showingTags = false;
+                document.getElementById('tagsDialog').style.display = 'none';
+                editorArea.focus();
+            }
+
+            function renderTagsList() {
+                const listEl = document.getElementById('tagsList');
+                listEl.innerHTML = '';
+                tagsList.forEach((tag, i) => {
+                    const div = document.createElement('div');
+                    div.textContent = tag;
+                    if (i === tagsIndex) {
+                        div.classList.add('selected');
+                        requestAnimationFrame(() => div.scrollIntoView({ block: "nearest" }));
+                    }
+                    div.addEventListener('click', () => {
+                        tagsIndex = i;
+                        insertSelectedTag();
+                    });
+                    listEl.appendChild(div);
+                });
+            }
+
+            function insertSelectedTag() {
+                if (tagsIndex < 0 || tagsIndex >= tagsList.length) return;
+                const tag = tagsList[tagsIndex];
+                const tagText = tag + ' ';
+                const editorArea = document.getElementById('editorArea');
+                if (editing) {
+                    const start = editorArea.selectionStart;
+                    const end = editorArea.selectionEnd;
+                    editorArea.setRangeText(tagText, start, end, "end");
+                    syncFile();
+                } else {
+                    editorArea.removeAttribute('readonly');
+                    editorArea.setRangeText(tagText, editorArea.value.length, editorArea.value.length, "end");
+                    syncFile();
+                    editorArea.setAttribute('readonly', 'readonly');
+                    editing = true;
+                    render();
+                    editorArea.focus();
+                    editorArea.setSelectionRange(editorArea.value.length, editorArea.value.length);
+                    scrollToCursor();
+                    setVimMode(false);
+                }
+                closeTagsDialog();
+            }
+
+            function handleTagsKey(e) {
+                if (!showingTags) return;
+                if (e.key === 'ArrowDown' || e.key === 'j') {
+                    tagsIndex = (tagsIndex + 1) % tagsList.length;
+                    renderTagsList();
+                    e.preventDefault();
+                    e.stopPropagation();
+                } else if (e.key === 'ArrowUp' || e.key === 'k') {
+                    tagsIndex = (tagsIndex - 1 + tagsList.length) % tagsList.length;
+                    renderTagsList();
+                    e.preventDefault();
+                    e.stopPropagation();
+                } else if (e.key === 'Enter') {
+                    insertSelectedTag();
+                    e.preventDefault();
+                    e.stopPropagation();
+                } else if (e.key === 'Escape') {
+                    closeTagsDialog();
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }
+
             function closeDialogs() {
                 closeSearch();
                 closeHelp();
@@ -6620,6 +6763,18 @@
                         return;
                     }
 
+                    if ((e.ctrlKey || e.metaKey) && e.key === "3") {
+                        e.preventDefault();
+                        openTagsDialog();
+                        return;
+                    }
+
+                    return;
+                }
+
+                if ((e.ctrlKey || e.metaKey) && e.key === "3" && !dialogOpen()) {
+                    e.preventDefault();
+                    openTagsDialog();
                     return;
                 }
 
@@ -7109,6 +7264,7 @@
             window.addEventListener('keydown', handleHistoryKey, { capture: true });
             window.addEventListener('keydown', handleLinksKey, { capture: true });
             window.addEventListener('keydown', handleMarksKey, { capture: true });
+            window.addEventListener('keydown', handleTagsKey, { capture: true });
             window.addEventListener('keydown', handleUndoKey, { capture: true });
 
         //---- Init ------------------------------------------------------------
