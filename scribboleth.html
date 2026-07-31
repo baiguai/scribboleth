@@ -352,6 +352,36 @@
                     overflow-y: auto;
                     box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
                 }
+                #tagsDialog {
+                    display: none;
+                    position: fixed;
+                    top: 10%;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    width: 400px;
+                    max-width: 90vw;
+                    max-height: 70%;
+                    background: var(--bg);
+                    color: var(--fg);
+                    border: 2px solid var(--border);
+                    border-radius: var(--border-radius);
+                    padding: 20px;
+                    z-index: 9999;
+                    font-family: monospace;
+                    overflow-y: auto;
+                    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+                }
+                #tagsList div {
+                    padding: 5px 6px;
+                    font-size: 0.9rem;
+                    cursor: pointer;
+                }
+                #tagsList div.selected {
+                    background: var(--sel-bg);
+                }
+                #tagsDialog h3 {
+                    margin-top: 0;
+                }
                 #linksDialog h3 {
                     margin-top: 0;
                 }
@@ -769,6 +799,12 @@
                 <div id="marksList"></div>
             </div>
 
+            <div id="tagsDialog" style="display: none;">
+                <h3>Tags</h3>
+                <div id="tagsList"></div>
+                <p style="color:var(--dim); font-size:0.9em; margin-bottom:0;">↑↓ j/k Navigate • Enter Insert • Esc Cancel</p>
+            </div>
+
             <div id="replaceDialog" style="display: none;">
                 <h3>Find<span id="ttlReplace"> &amp; Replace<span></h3>
                 <label id="lblFind" for="searchText">Find</label>
@@ -917,6 +953,9 @@
             let editing = false;
             let showingLinks = false;
             let showingMarks = false;
+            let showingTags = false;
+            let tagsList = [];
+            let tagsIndex = 0;
             let showingHelp = false;
             let currentTheme = null;
             let themes = [
@@ -1212,6 +1251,7 @@
                     { key: "Control+\\", mode: "INSERT", description: "Wrap selected text" },
                     { key: "Control+;", mode: "INSERT", description: "Create/Update table" },
                     { key: "Control+'", mode: "INSERT", description: "Insert Link" },
+                    { key: "Control+3", mode: "INSERT", description: "Show all tags dialog" },
                 ];
                 
                 let helpVimEnabled = [
@@ -1882,6 +1922,9 @@
                     openDialog = true;
                 }
                 if (marksDialog.style.display === "block") {
+                    openDialog = true;
+                }
+                if (document.getElementById('tagsDialog').style.display === "block") {
                     openDialog = true;
                 }
                 if (historyDialog.style.display === "block") {
@@ -4380,6 +4423,107 @@
                 showingMarks = false;
             }
 
+            function collectAllTags() {
+                const tagSet = new Set();
+                (function walk(nodes) {
+                    for (const n of nodes) {
+                        const content = n.content || '';
+                        const matches = content.match(/#[\w-]+/g) || [];
+                        for (const t of matches) {
+                            if (/^#(?:[0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(t)) continue;
+                            tagSet.add(t.toLowerCase());
+                        }
+                        if (n.children && n.children.length) walk(n.children);
+                    }
+                })(treeData);
+                return [...tagSet].sort();
+            }
+
+            function openTagsDialog() {
+                if (readOnly) return;
+                tagsList = collectAllTags();
+                if (tagsList.length === 0) {
+                    showMessage('No tags found');
+                    return;
+                }
+                tagsIndex = 0;
+                showingTags = true;
+                document.getElementById('tagsDialog').style.display = 'block';
+                renderTagsList();
+            }
+
+            function closeTagsDialog() {
+                showingTags = false;
+                document.getElementById('tagsDialog').style.display = 'none';
+                editorArea.focus();
+            }
+
+            function renderTagsList() {
+                const listEl = document.getElementById('tagsList');
+                listEl.innerHTML = '';
+                tagsList.forEach((tag, i) => {
+                    const div = document.createElement('div');
+                    div.textContent = tag;
+                    if (i === tagsIndex) {
+                        div.classList.add('selected');
+                        requestAnimationFrame(() => div.scrollIntoView({ block: "nearest" }));
+                    }
+                    div.addEventListener('click', () => {
+                        tagsIndex = i;
+                        insertSelectedTag();
+                    });
+                    listEl.appendChild(div);
+                });
+            }
+
+            function insertSelectedTag() {
+                if (tagsIndex < 0 || tagsIndex >= tagsList.length) return;
+                const tag = tagsList[tagsIndex];
+                const tagText = tag + ' ';
+                const editorArea = document.getElementById('editorArea');
+                if (editing) {
+                    const start = editorArea.selectionStart;
+                    const end = editorArea.selectionEnd;
+                    editorArea.setRangeText(tagText, start, end, "end");
+                    syncFile();
+                } else {
+                    editorArea.removeAttribute('readonly');
+                    editorArea.setRangeText(tagText, editorArea.value.length, editorArea.value.length, "end");
+                    syncFile();
+                    editorArea.setAttribute('readonly', 'readonly');
+                    editing = true;
+                    render();
+                    editorArea.focus();
+                    editorArea.setSelectionRange(editorArea.value.length, editorArea.value.length);
+                    scrollToCursor();
+                    setVimMode(false);
+                }
+                closeTagsDialog();
+            }
+
+            function handleTagsKey(e) {
+                if (!showingTags) return;
+                if (e.key === 'ArrowDown' || e.key === 'j') {
+                    tagsIndex = (tagsIndex + 1) % tagsList.length;
+                    renderTagsList();
+                    e.preventDefault();
+                    e.stopPropagation();
+                } else if (e.key === 'ArrowUp' || e.key === 'k') {
+                    tagsIndex = (tagsIndex - 1 + tagsList.length) % tagsList.length;
+                    renderTagsList();
+                    e.preventDefault();
+                    e.stopPropagation();
+                } else if (e.key === 'Enter') {
+                    insertSelectedTag();
+                    e.preventDefault();
+                    e.stopPropagation();
+                } else if (e.key === 'Escape') {
+                    closeTagsDialog();
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }
+
             function closeDialogs() {
                 closeSearch();
                 closeHelp();
@@ -5697,6 +5841,18 @@
                         return;
                     }
 
+                    if ((e.ctrlKey || e.metaKey) && e.key === "3") {
+                        e.preventDefault();
+                        openTagsDialog();
+                        return;
+                    }
+
+                    return;
+                }
+
+                if ((e.ctrlKey || e.metaKey) && e.key === "3" && !dialogOpen()) {
+                    e.preventDefault();
+                    openTagsDialog();
                     return;
                 }
 
@@ -6186,6 +6342,7 @@
             window.addEventListener('keydown', handleHistoryKey, { capture: true });
             window.addEventListener('keydown', handleLinksKey, { capture: true });
             window.addEventListener('keydown', handleMarksKey, { capture: true });
+            window.addEventListener('keydown', handleTagsKey, { capture: true });
             window.addEventListener('keydown', handleUndoKey, { capture: true });
 
         //---- Init ------------------------------------------------------------
