@@ -4430,6 +4430,7 @@
                         const content = n.content || '';
                         const matches = content.match(/#[\w-]+/g) || [];
                         for (const t of matches) {
+                            if (/^#(?:[0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(t)) continue;
                             tagSet.add(t.toLowerCase());
                         }
                         if (n.children && n.children.length) walk(n.children);
