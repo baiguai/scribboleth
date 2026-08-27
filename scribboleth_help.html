@@ -6560,6 +6560,24 @@
                 matchingTags = [];
                 if (!tag) {
                     tagSearchPhase = 'tags';
+                    // Show ALL available tags, not an empty list
+                    const allTagSet = {};
+                    (function walk(nodes) {
+                        for (const n of nodes) {
+                            const nodeContent = n.content || '';
+                            const matches = nodeContent.match(/#[\w-]+/g) || [];
+                            for (const t of matches) {
+                                allTagSet[t.slice(1).toLowerCase()] = true;
+                            }
+                            if (n.children && n.children.length) {
+                                walk(n.children);
+                            }
+                        }
+                    })(treeData);
+                    for (const t of Object.keys(allTagSet)) {
+                        matchingTags.push('#' + t);
+                    }
+                    matchingTags.sort();
                     renderSearchList();
                     return;
                 }
