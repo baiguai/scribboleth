@@ -1894,7 +1894,7 @@
             let importedFileName = null;
 
             let fileName = "scribboleth_help";
-            let curVersion = "1.0.11"
+            let curVersion = "1.0.12"
             let showInitHelp = false;
             let headerTemplate = "__| ^*^ |__";
             let selectedId = null;
@@ -2048,8 +2048,8 @@
             let searchIndex = 0;
             let tagSearchPhase = 'tags';
             let matchingTags = [];
-            let peekActive = false;
-            let peekSavedId = null;
+            let collectResultsMode = false;
+            let collectResultsAsChild = false;
             const helpDialog = document.getElementById('helpDialog');
             const helpDialogVimEdit = document.getElementById('helpDialogVimEdit');
             const helpDialogVimDisabled = document.getElementById('helpDialogVimDisabled');
@@ -2111,8 +2111,8 @@
                     { key: "N", mode: "TREE", description: "Toggle tree visibility" },
                     { key: "]", mode: "TREE", description: "Expand the treeview panel" },
                     { key: "[", mode: "TREE", description: "Shrink the treeview panel" },
-                    { key: "/", mode: "TREE", description: "Search (begin with : labels, r: regex, # tags, +: all words comma sep)" },
-                    { key: "\\", mode: "TREE", description: "Peek search (search results replace treeview)" },
+                    { key: "/", mode: "TREE", description: "Search (begin with : labels, r: regex, # tags, +: all words space sep)" },
+                    { key: "\\", mode: "TREE", description: "Search, then create a root node with links to all results" },
                     { key: "f", mode: "TREE", description: "Find text in the current note " },
                     { key: "#", mode: "TREE", description: "Show note links dialog" },
                     { key: "<", mode: "TREE", description: "Show the history dialog" },
@@ -2181,8 +2181,8 @@
                     { key: "D", mode: "TREE", description: "Delete the current node" },
                     { key: "i", mode: "TREE", description: "Edit current note" },
                     { key: "I", mode: "TREE", description: "Edit current note" },
-                    { key: "/", mode: "TREE", description: "Search (begin with : labels, r: regex, # tags, +: all words comma sep)" },
-                    { key: "\\", mode: "TREE", description: "Peek search (search results replace treeview)" },
+                    { key: "/", mode: "TREE", description: "Search (begin with : labels, r: regex, # tags, +: all words space sep)" },
+                    { key: "\\", mode: "TREE", description: "Search, then create a root node with links to all results" },
                     { key: "f", mode: "TREE", description: "Find/Replace text in the current note " },
                     { key: "#", mode: "TREE", description: "Show note links dialog" },
                     { key: "<", mode: "TREE", description: "Show the history dialog" },
@@ -2250,6 +2250,7 @@
                     { key: "v", mode: "NORMAL", description: "Enter VISUAL mode" },
                     { key: "V", mode: "NORMAL", description: "Enter VISUAL LINE mode" },
                     { key: "Control+v", mode: "NORMAL", description: "Enter VISUAL BLOCK mode" },
+                    { key: "\\", mode: "NORMAL", description: "Search, then create a child node with links to all results" },
                     { key: "v,i,w", mode: "NORMAL", description: "Select the word at cursor" },
                     { key: "d,i,w", mode: "NORMAL", description: "Delete the word at cursor" },
                     { key: "Escape", mode: "VISUAL", description: "Exit to NORMAL mode" },
@@ -3520,6 +3521,12 @@
                             mode_insert = true;
                             performed = true;
                             modeEl.textContent = 'INSERT';
+                            break;
+                        case '\\':
+                            openSearch();
+                            collectResultsMode = true;
+                            collectResultsAsChild = true;
+                            performed = true;
                             break;
                         case 'h': // Move left
                             let newPosBack = Math.max(0, editorArea.selectionStart - mode_repeat);
@@ -5759,11 +5766,6 @@
                 closeUndoDialog();
                 closeVersionDialog();
                 closeThemeEditorDialog();
-                if (peekActive) {
-                    selectedId = peekSavedId;
-                    closePeekSearch();
-                    render();
-                }
             }
 
         //---- Finding and Replacing -------------------------------------------
@@ -6375,6 +6377,8 @@
         //---- Search ----------------------------------------------------------
             function openSearch() {
                 searchActive = true;
+                collectResultsMode = false;
+                collectResultsAsChild = false;
                 searchDialog.style.display = 'flex';
                 searchInput.value = '';
                 searchInput.focus();
@@ -6390,30 +6394,37 @@
                 searchDialog.style.display = 'none';
             }
 
-            function openPeekSearch() {
-                peekActive = true;
-                peekSavedId = selectedId;
-                const treeEl = document.getElementById('tree');
-                const treeRect = treeEl.getBoundingClientRect();
-                searchDialog.style.top = treeRect.top + 'px';
-                searchDialog.style.left = treeRect.left + 'px';
-                searchDialog.style.width = treeRect.width + 'px';
-                searchDialog.style.height = treeRect.height + 'px';
-                searchDialog.style.maxHeight = treeRect.height + 'px';
-                searchDialog.style.transform = 'none';
-                searchDialog.style.maxWidth = 'none';
-                openSearch();
-            }
-
-            function closePeekSearch() {
-                peekActive = false;
-                searchDialog.style.top = '';
-                searchDialog.style.left = '';
-                searchDialog.style.width = '';
-                searchDialog.style.height = '';
-                searchDialog.style.maxHeight = '';
-                searchDialog.style.transform = '';
-                searchDialog.style.maxWidth = '';
+            function createSearchResultsNode() {
+                if (!searchMatches.length || readOnly) return;
+                const query = searchInput.value.trim();
+                const title = query ? 'Search Results: ' + query : 'Search Results';
+                const node = {
+                    id: makeId(),
+                    title: title,
+                    content: searchMatches.map(n => '_' + (n.title || '(untitled)') + '_').join('\n'),
+                    children: [],
+                    expanded: true
+                };
+                if (collectResultsAsChild) {
+                    const info = findNodeAndParentById(selectedId);
+                    if (!info) {
+                        treeData.push(node);
+                    } else {
+                        info.node.expanded = true;
+                        info.node.children.push(node);
+                    }
+                } else {
+                    treeData.push(node);
+                }
+                selectedId = node.id;
+                editing = false;
+                mode_insert = false;
+                mode_visual = false;
+                mode_visual_block = false;
+                modeEl.textContent = 'TREE';
+                render();
+                closeSearch();
+                showMessage('Created ' + title);
             }
 
             function searchTree(query) {
@@ -6489,7 +6500,7 @@
                     return;
                 }
 
-                const words = query.toLowerCase().split(',').map(w => w.trim()).filter(w => w);
+                const words = query.toLowerCase().split(/\s+/).map(w => w.trim()).filter(w => w);
                 if (words.length === 0) {
                     renderSearchList();
                     return;
@@ -6669,9 +6680,12 @@
                     }
                     item.addEventListener('click', () => {
                         if (searchMatches.length > 0) {
+                            if (collectResultsMode) {
+                                createSearchResultsNode();
+                                return;
+                            }
                             selectSearchResult(i);
                             closeSearch();
-                            if (peekActive) closePeekSearch();
                             const selInfo = findNodeAndParentById(selectedId);
                             if (selInfo && !isFolder(selInfo.node)) {
                                 editing = true;
@@ -6723,18 +6737,10 @@
                     const max = tagSearchPhase === 'tags' ? matchingTags.length - 1 : searchMatches.length - 1;
                     searchIndex = Math.min(searchIndex + 1, max);
                     renderSearchList();
-                    if (peekActive && tagSearchPhase !== 'tags' && searchMatches.length > 0) {
-                        const n = searchMatches[searchIndex];
-                        if (n) { selectedId = n.id; expandToNode(n.id); render(); }
-                    }
                     e.preventDefault();
                 } else if (e.key === 'ArrowUp') {
                     searchIndex = Math.max(searchIndex - 1, 0);
                     renderSearchList();
-                    if (peekActive && tagSearchPhase !== 'tags' && searchMatches.length > 0) {
-                        const n = searchMatches[searchIndex];
-                        if (n) { selectedId = n.id; expandToNode(n.id); render(); }
-                    }
                     e.preventDefault();
                 } else if (e.key === 'Backspace' && tagSearchPhase === 'notes') {
                     const query = searchInput.value;
@@ -6767,10 +6773,12 @@
                             searchTreeTags(selectedTag.substring(1));
                         }
                         e.preventDefault();
+                    } else if (collectResultsMode && searchMatches.length > 0) {
+                        createSearchResultsNode();
+                        e.preventDefault();
                     } else if (searchMatches.length > 0) {
                         selectSearchResult(searchIndex);
                         closeSearch();
-                        if (peekActive) closePeekSearch();
                         const selInfo = findNodeAndParentById(selectedId);
                         if (selInfo && !isFolder(selInfo.node)) {
                             if (!readOnly) {
@@ -6789,13 +6797,12 @@
                         }
                     }
                 } else if (e.key === 'Escape') {
-                    if (peekActive) {
-                        selectedId = peekSavedId;
-                        render();
-                        closeSearch();
-                        closePeekSearch();
-                    } else {
-                        closeSearch();
+                    closeSearch();
+                    if (editing && mode_vim && !mode_insert) {
+                        editorArea.focus();
+                        editorArea.classList.remove('normal-mode');
+                        void editorArea.offsetWidth;
+                        editorArea.classList.add('normal-mode');
                     }
                 }
             });
@@ -7313,7 +7320,9 @@
                 }
 
                 if (e.key === '\\' && !editing && !dialogOpen()) {
-                    openPeekSearch();
+                    openSearch();
+                    collectResultsMode = true;
+                    collectResultsAsChild = false;
                     e.preventDefault();
                     return;
                 }
