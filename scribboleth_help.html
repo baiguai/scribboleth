@@ -4836,18 +4836,65 @@
                 const end = ta.selectionEnd;
                 const value = ta.value;
 
-                // Get selection or current line if none
-                const sel = start !== end
-                    ? value.slice(start, end)
-                    : (() => {
-                        const ls = value.lastIndexOf("\n", start - 1) + 1;
-                        const le = value.indexOf("\n", start);
-                        return value.slice(ls, le === -1 ? value.length : le);
-                    })();
+                let selStart = start;
+                let selEnd = end;
+                let sel;
 
-                if (!/\|/.test(sel)) return; // no table detected
+                if (start !== end) {
+                    sel = value.slice(start, end);
+                } else {
+                    // Get current line
+                    const ls = value.lastIndexOf("\n", start - 1) + 1;
+                    const le = value.indexOf("\n", start);
+                    const currentLine = value.slice(ls, le === -1 ? value.length : le);
+                    const dividerPatternCur = /^\s*(?:[\|+]\s*-+\s*(?:[\|+]\s*-+\s*)*[\|+]|-+)\s*$/;
+                    if (!/\|/.test(currentLine) && !dividerPatternCur.test(currentLine)) return; // no table detected
 
-                const rawLines = sel.trim().split(/\r?\n/);
+                    // Walk up to find start of table
+                    let lineStart = ls;
+                    let pos = ls - 1;
+                    const dividerPatternWalk = /^\s*(?:[\|+]\s*-+\s*(?:[\|+]\s*-+\s*)*[\|+]|-+)\s*$/;
+                    while (pos >= 0) {
+                        const prevLineStart = value.lastIndexOf("\n", pos - 1) + 1;
+                        const prevLineEnd = value.indexOf("\n", pos);
+                        const prevLine = value.slice(prevLineStart, prevLineEnd === -1 ? pos + 1 : prevLineEnd);
+                        // Stop if line is empty (or just whitespace)
+                        if (/^\s*$/.test(prevLine)) break;
+                        // Table line contains | or is a divider
+                        if (/\|/.test(prevLine) || dividerPatternWalk.test(prevLine)) {
+                            lineStart = prevLineStart;
+                            pos = prevLineStart - 1;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    // Walk down to find end of table
+                    let lineEnd = le === -1 ? value.length : le;
+                    let posDown = le === -1 ? value.length : le;
+                    while (posDown < value.length) {
+                        const nextLineStart = posDown + (value[posDown] === "\n" ? 1 : 0);
+                        if (nextLineStart > value.length) break;
+                        const nextLineEnd = value.indexOf("\n", nextLineStart);
+                        const nextLine = value.slice(nextLineStart, nextLineEnd === -1 ? value.length : nextLineEnd);
+                        if (/^\s*$/.test(nextLine)) break;
+                        if (/\|/.test(nextLine) || dividerPatternWalk.test(nextLine)) {
+                            lineEnd = nextLineEnd === -1 ? value.length : nextLineEnd;
+                            posDown = nextLineEnd === -1 ? value.length : nextLineEnd;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    selStart = lineStart;
+                    selEnd = lineEnd;
+                    sel = value.slice(selStart, selEnd);
+                }
+
+                const dividerPatternCheck = /^\s*(?:[\|+]\s*-+\s*(?:[\|+]\s*-+\s*)*[\|+]|-+)\s*$/;
+                if (!/\|/.test(sel) && !dividerPatternCheck.test(sel)) return; // no table detected
+
+                const rawLines = sel.replace(/\r\n/g, "\n").split("\n");
 
                 // Matches:
                 //   | ---- | ---- |   (old markdown style)
@@ -4907,9 +4954,13 @@
                     finalRows.length = 0;
                     finalRows.push(...padded);
                 }
-                finalRows.push("");
 
-                ta.setRangeText(finalRows.join("\n"), start, end, "select");
+
+                // Preserve trailing newline if original selection ended at line boundary
+                const formatted = finalRows.join("\n");
+                const endsAtNewline = selEnd < value.length && value[selEnd] === "\n";
+                const result = endsAtNewline && !formatted.endsWith("\n") ? formatted + "\n" : formatted;
+                ta.setRangeText(result, selStart, selEnd, "select");
             }
 
             function renumberOrderedList() {
@@ -7253,7 +7304,7 @@
                         return;
                     }
 
-                    if (e.ctrlKey && e.key === ";") {
+                    if ((e.ctrlKey || e.metaKey) && e.key === ";") {
                         e.preventDefault();
                         formatMarkdownTable();
                     }
