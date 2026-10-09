@@ -4029,11 +4029,12 @@
                     finalRows.length = 0;
                     finalRows.push(...padded);
                 }
-                finalRows.push("");
+
 
                 // Preserve trailing newline if original selection ended at line boundary
+                const formatted = finalRows.join("\n");
                 const endsAtNewline = selEnd < value.length && value[selEnd] === "\n";
-                const result = finalRows.join("\n") + (endsAtNewline && !finalRows[finalRows.length - 1].endsWith("\n") ? "\n" : "");
+                const result = endsAtNewline && !formatted.endsWith("\n") ? formatted + "\n" : formatted;
                 ta.setRangeText(result, selStart, selEnd, "select");
             }
 
