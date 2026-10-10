@@ -1894,7 +1894,7 @@
             let importedFileName = null;
 
             let fileName = "scribboleth_help";
-            let curVersion = "1.0.12"
+            let curVersion = "1.0.13"
             let showInitHelp = false;
             let headerTemplate = "__| ^*^ |__";
             let selectedId = null;
@@ -2250,6 +2250,7 @@
                     { key: "v", mode: "NORMAL", description: "Enter VISUAL mode" },
                     { key: "V", mode: "NORMAL", description: "Enter VISUAL LINE mode" },
                     { key: "Control+v", mode: "NORMAL", description: "Enter VISUAL BLOCK mode" },
+                    { key: "Control+l", mode: "NORMAL", description: "Open the link under the cursor" },
                     { key: "\\", mode: "NORMAL", description: "Search, then create a child node with links to all results" },
                     { key: "v,i,w", mode: "NORMAL", description: "Select the word at cursor" },
                     { key: "d,i,w", mode: "NORMAL", description: "Delete the word at cursor" },
@@ -2560,35 +2561,8 @@
 
                 editorArea.addEventListener('dblclick', (e) => {
                     if (readOnly) return;
-                    const cursorPos = editorArea.selectionStart;
-                    if (cursorPos < 0) return;
-                    const content = editorArea.value;
-                    const link = findLinkAtCursor(content, cursorPos);
-                    if (!link) return;
+                    if (!openLinkAtCursor()) return;
                     e.preventDefault();
-                    if (link.type === 'url') {
-                        window.open(link.target, '_blank');
-                    } else if (link.type === 'note') {
-                        const title = link.title.toLowerCase();
-                        let foundNode = null;
-                        (function walk(nodes) {
-                            for (const n of nodes) {
-                                if (n.title && n.title.toLowerCase() === title) {
-                                    foundNode = n;
-                                    return;
-                                }
-                                if (n.children && n.children.length) walk(n.children);
-                                if (foundNode) return;
-                            }
-                        })(treeData);
-                        if (foundNode) {
-                            expandToNode(foundNode.id);
-                            selectedId = foundNode.id;
-                            editing = false;
-                            closeLinksDialog();
-                            render();
-                        }
-                    }
                 });
 
                 function syncFile() {
@@ -3533,7 +3507,14 @@
                             moveChar(newPosBack, true);
                             performed = true;
                             break;
-                        case 'l': // Move right
+                        case 'l': // Move right, or open the link at the cursor (Ctrl+l)
+                            if ((e.ctrlKey || e.metaKey) && !mode_visual && !mode_visual_block) {
+                                if (!openLinkAtCursor()) {
+                                    showMessage("No link at cursor");
+                                }
+                                performed = true;
+                                break;
+                            }
                             let newPosFwd = Math.min(editorArea.value.length, editorArea.selectionStart + mode_repeat);
                             moveChar(newPosFwd, false);
                             performed = true;
@@ -5103,6 +5084,43 @@
             }
 
         //---- Links -----------------------------------------------------------
+            function openLinkAtCursor() {
+                const cursorPos = editorArea.selectionStart;
+                if (cursorPos < 0) return false;
+                const link = findLinkAtCursor(editorArea.value, cursorPos);
+                if (!link) return false;
+
+                if (link.type === 'url') {
+                    window.open(link.target, '_blank');
+                    return true;
+                }
+
+                if (link.type === 'note') {
+                    const title = link.title.toLowerCase();
+                    let foundNode = null;
+                    (function walk(nodes) {
+                        for (const n of nodes) {
+                            if (n.title && n.title.toLowerCase() === title) {
+                                foundNode = n;
+                                return;
+                            }
+                            if (n.children && n.children.length) walk(n.children);
+                            if (foundNode) return;
+                        }
+                    })(treeData);
+                    if (foundNode) {
+                        expandToNode(foundNode.id);
+                        selectedId = foundNode.id;
+                        editing = false;
+                        closeLinksDialog();
+                        render();
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
             function findLinkAtCursor(content, cursorPos) {
                 const markdownRegex = /\[([^\]]+)\](?:[ \t]*\r?\n[ \t]*|[ \t]*)(https?:\/\/\S+|file:\/\/\S+|_[^_]+_)/gi;
                 let match;
