@@ -450,6 +450,28 @@
                     margin: 8px 0 0;
                 }
 
+                /* Dead Links Dialog */
+                #missingLinksList .ml-row {
+                    display: flex;
+                    align-items: baseline;
+                    gap: 8px;
+                    white-space: nowrap;
+                }
+                #missingLinksList .ml-title {
+                    color: var(--danger);
+                    flex-shrink: 0;
+                }
+                #missingLinksList .ml-source {
+                    color: var(--muted);
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+                #missingLinksDialog .ml-hint {
+                    color: var(--muted);
+                    font-size: 0.9em;
+                    margin: 8px 0 0;
+                }
+
                 /* Options Dialog */
                 #optionsDialog {
                     position: fixed;
@@ -848,6 +870,12 @@
                 <p class="lt-hint">↑↓ Navigate • / Filter • Enter Open • Esc Close</p>
             </div>
 
+            <div id="missingLinksDialog" class="search-dialog" style="display: none;">
+                <h3 style="margin: 0 0 8px;">Dead Intra-Document Links</h3>
+                <div id="missingLinksList" class="search-results"></div>
+                <p class="ml-hint">j/k Navigate • gg/G First/Last • Enter Open • Esc Close</p>
+            </div>
+
             <div id="marksDialog" style="display: none;">
                 <h3>Bookmarks</h3>
                 <div id="marksList"></div>
@@ -1012,6 +1040,11 @@
             let linkTreeVisible = [];
             let linkTreeIndex = 0;
             let linkTreeFilterActive = false;
+            let showingMissingLinks = false;
+            let missingLinkEntries = [];
+            let missingLinksIndex = 0;
+            let missingLinksPendingG = false;
+            let missingLinksGTimer = null;
             let showingMarks = false;
             let showingTags = false;
             let tagsList = [];
@@ -1173,6 +1206,8 @@
             const linkTreeDialog = document.getElementById('linkTreeDialog');
             const linkTreeFilterInput = document.getElementById('linkTreeFilter');
             const linkTreeList = document.getElementById('linkTreeList');
+            const missingLinksDialog = document.getElementById('missingLinksDialog');
+            const missingLinksList = document.getElementById('missingLinksList');
             const marksDialog = document.getElementById('marksDialog');
             const historyDialog = document.getElementById('historyDialog');
             const undoDialog = document.getElementById('undoDialog');
@@ -1231,6 +1266,7 @@
                     { key: "f", mode: "TREE", description: "Find text in the current note " },
                     { key: "#", mode: "TREE", description: "Show note links dialog" },
                     { key: "V", mode: "TREE", description: "Show the link tree dialog" },
+                    { key: "X", mode: "TREE", description: "Show dead intra-document links" },
                     { key: "<", mode: "TREE", description: "Show the history dialog" },
                     { key: "gg", mode: "TREE", description: "Select first root tree node" },
                     { key: "G", mode: "TREE", description: "Select last root tree node" },
@@ -1303,7 +1339,7 @@
                     { key: "#", mode: "TREE", description: "Show note links dialog" },
                     { key: "V", mode: "TREE", description: "Show the link tree dialog" },
                     { key: "<", mode: "TREE", description: "Show the history dialog" },
-                    { key: "X", mode: "TREE", description: "Show broken note links" },
+                    { key: "X", mode: "TREE", description: "Show dead intra-document links" },
                     { key: "s", mode: "TREE", description: "Save the current file" },
                     { key: "S", mode: "TREE", description: "Save as" },
                     { key: "n", mode: "TREE", description: "Save via NodeJs saver server" },
@@ -1904,10 +1940,8 @@
                 renderMarksList(); // Call the global renderMarksList
             }
 
-            function openMissingLinksDialog() {
-                if (readOnly) return;
-                showingLinks = true;
-                const nodeLinkRegex = /(?:^|\s)_([^_]|[^_].*?[^_])_(?=\s|[.,!?;:)]|$)/g;
+            function collectMissingLinks() {
+                const nodeLinkRegex = /(?:^|\s|\()_([^_]|[^_].*?[^_])_(?=\s|[.,!?;:)]|$)/g;
 
                 // Gather all node titles (case-insensitive)
                 const allTitles = new Set();
@@ -1920,67 +1954,230 @@
                     }
                 })(treeData);
 
-                // Map of missingLink → set of nodes that reference it
-                const missingMap = new Map();
+                const entries = [];
 
                 (function walk(nodes) {
                     for (const n of nodes) {
                         if (n.content) {
-                            let seenInThisNode = new Set(); // avoid dupes within the same note
                             let match;
+                            nodeLinkRegex.lastIndex = 0;
                             while ((match = nodeLinkRegex.exec(n.content)) !== null) {
                                 const linkTitle = match[1].trim();
-                                if (!allTitles.has(linkTitle.toLowerCase())) {
-                                    if (!seenInThisNode.has(linkTitle.toLowerCase())) {
-                                        if (!missingMap.has(linkTitle)) {
-                                            missingMap.set(linkTitle, []);
-                                        }
-                                        missingMap.get(linkTitle).push({
-                                            nodeId: n.id,
-                                            nodeTitle: n.title || '(untitled)'
-                                        });
-                                        seenInThisNode.add(linkTitle.toLowerCase());
-                                    }
-                                }
+                                if (!linkTitle || allTitles.has(linkTitle.toLowerCase())) continue;
+
+                                const innerStart = match[0].indexOf('_');
+                                const innerEnd = match[0].lastIndexOf('_');
+                                const linkStart = match.index + innerStart;
+                                const linkLength = innerEnd - innerStart + 1;
+                                const line = n.content.slice(0, linkStart).split('\n').length - 1;
+
+                                entries.push({
+                                    missingTitle: linkTitle,
+                                    token: match[0].slice(innerStart, innerEnd + 1),
+                                    nodeId: n.id,
+                                    nodeTitle: n.title || '(untitled)',
+                                    line,
+                                    linkStart,
+                                    linkLength
+                                });
                             }
                         }
                         if (n.children && n.children.length) walk(n.children);
                     }
                 })(treeData);
 
-                const listEl = document.getElementById('linksList');
-                listEl.innerHTML = '';
+                return entries;
+            }
 
-                if (missingMap.size === 0) {
-                    listEl.innerHTML = '<p>No missing links found</p>';
-                } else {
-                    listEl.innerHTML = '<p>Missing Links:</p>';
-                    for (const [missingTitle, refs] of missingMap.entries()) {
-                        refs.forEach(ref => {
-                            const container = document.createElement('div');
+            function renderMissingLinks() {
+                missingLinksList.innerHTML = '';
 
-                            const link = document.createElement('a');
-                            link.href = '#';
-                            link.textContent = `"${missingTitle}" — linked from: ${ref.nodeTitle}`;
-                            link.style.color = 'var(--dim)';
-                            link.title = 'Missing link — click to go to note';
-
-                            // Clicking takes you to the referencing note
-                            link.addEventListener('click', (e) => {
-                                e.preventDefault();
-                                expandToNode(ref.nodeId);
-                                selectedId = ref.nodeId;
-                                closeLinksDialog();
-                                render();
-                            });
-
-                            container.appendChild(link);
-                            listEl.appendChild(container);
-                        });
-                    }
+                if (missingLinkEntries.length === 0) {
+                    const empty = document.createElement('div');
+                    empty.textContent = '(no dead intra-document links found)';
+                    empty.style.color = 'var(--muted)';
+                    missingLinksList.appendChild(empty);
+                    missingLinksIndex = 0;
+                    return;
                 }
 
-                linksDialog.style.display = 'block';
+                if (missingLinksIndex >= missingLinkEntries.length) {
+                    missingLinksIndex = missingLinkEntries.length - 1;
+                }
+                if (missingLinksIndex < 0) missingLinksIndex = 0;
+
+                const frag = document.createDocumentFragment();
+                missingLinkEntries.forEach((entry, i) => {
+                    const row = document.createElement('div');
+                    row.className = 'ml-row' + (i === missingLinksIndex ? ' selected' : '');
+
+                    const title = document.createElement('span');
+                    title.className = 'ml-title';
+                    title.textContent = `"${entry.missingTitle}"`;
+
+                    const source = document.createElement('span');
+                    source.className = 'ml-source';
+                    source.textContent = `in ${entry.nodeTitle} (line ${entry.line + 1})`;
+
+                    row.appendChild(title);
+                    row.appendChild(source);
+                    row.addEventListener('click', () => {
+                        missingLinksIndex = i;
+                        showSelectedMissingLink();
+                    });
+                    frag.appendChild(row);
+                });
+
+                missingLinksList.appendChild(frag);
+                const selected = missingLinksList.querySelector('.ml-row.selected');
+                if (selected) {
+                    requestAnimationFrame(() => selected.scrollIntoView({ block: 'nearest' }));
+                }
+            }
+
+            function openMissingLinksDialog() {
+                missingLinkEntries = collectMissingLinks();
+                missingLinksIndex = 0;
+                missingLinksPendingG = false;
+                showingMissingLinks = true;
+                missingLinksDialog.style.display = 'flex';
+                renderMissingLinks();
+            }
+
+            function closeMissingLinksDialog() {
+                showingMissingLinks = false;
+                missingLinksDialog.style.display = 'none';
+                missingLinksIndex = 0;
+                missingLinksPendingG = false;
+                if (missingLinksGTimer) {
+                    clearTimeout(missingLinksGTimer);
+                    missingLinksGTimer = null;
+                }
+            }
+
+            function moveMissingLinksSelection(delta) {
+                if (!missingLinkEntries.length) return;
+                missingLinksIndex = (missingLinksIndex + delta + missingLinkEntries.length) % missingLinkEntries.length;
+                renderMissingLinks();
+            }
+
+            function showSelectedMissingLink() {
+                const entry = missingLinkEntries[missingLinksIndex];
+                if (!entry) return;
+
+                closeMissingLinksDialog();
+                expandToNode(entry.nodeId);
+                selectedId = entry.nodeId;
+                editing = false;
+                mode_insert = false;
+                mode_visual = false;
+                mode_visual_block = false;
+                render();
+
+                const info = findNodeAndParentById(entry.nodeId);
+                if (!info) return;
+
+                const lines = safeRestoreText(info.node.content || '').split('\n');
+                const lineIndex = Math.max(0, Math.min(entry.line, lines.length - 1));
+                let position = 0;
+                for (let i = 0; i < lineIndex; i++) {
+                    position += lines[i].length + 1;
+                }
+
+                const needle = entry.token || `_${entry.missingTitle}_`;
+                const lineText = lines[lineIndex] || '';
+                let col = lineText.indexOf(needle);
+                if (col < 0) col = lineText.toLowerCase().indexOf(needle.toLowerCase());
+                const targetPos = position + (col >= 0 ? col : 0);
+
+                if (!readOnly) {
+                    editing = true;
+                    render();
+                }
+
+                editorArea.focus();
+                editorArea.setSelectionRange(targetPos, targetPos);
+                scrollToCursor();
+                if (!readOnly) setVimMode(false);
+            }
+
+            function handleMissingLinksKey(e) {
+                if (!showingMissingLinks) return;
+
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    closeMissingLinksDialog();
+                    return;
+                }
+
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showSelectedMissingLink();
+                    return;
+                }
+
+                if (e.key === 'ArrowDown' || e.key === 'j') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    missingLinksPendingG = false;
+                    moveMissingLinksSelection(1);
+                    return;
+                }
+
+                if (e.key === 'ArrowUp' || e.key === 'k') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    missingLinksPendingG = false;
+                    moveMissingLinksSelection(-1);
+                    return;
+                }
+
+                if (e.key === 'G' || e.key === 'End') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    missingLinksPendingG = false;
+                    if (missingLinkEntries.length) {
+                        missingLinksIndex = missingLinkEntries.length - 1;
+                        renderMissingLinks();
+                    }
+                    return;
+                }
+
+                if (e.key === 'Home') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    missingLinksPendingG = false;
+                    if (missingLinkEntries.length) {
+                        missingLinksIndex = 0;
+                        renderMissingLinks();
+                    }
+                    return;
+                }
+
+                if (e.key === 'g') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (missingLinksPendingG) {
+                        missingLinksPendingG = false;
+                        if (missingLinksGTimer) {
+                            clearTimeout(missingLinksGTimer);
+                            missingLinksGTimer = null;
+                        }
+                        if (missingLinkEntries.length) {
+                            missingLinksIndex = 0;
+                            renderMissingLinks();
+                        }
+                    } else {
+                        missingLinksPendingG = true;
+                        if (missingLinksGTimer) clearTimeout(missingLinksGTimer);
+                        missingLinksGTimer = setTimeout(() => {
+                            missingLinksPendingG = false;
+                            missingLinksGTimer = null;
+                        }, 600);
+                    }
+                }
             }
 
             function dialogOpen() {
@@ -2002,6 +2199,9 @@
                     openDialog = true;
                 }
                 if (showingLinkTree || linkTreeDialog.style.display === "flex") {
+                    openDialog = true;
+                }
+                if (showingMissingLinks || missingLinksDialog.style.display === "flex") {
                     openDialog = true;
                 }
                 if (marksDialog.style.display === "block") {
@@ -5263,6 +5463,7 @@
                 closeReplace();
                 closeLinksDialog();
                 closeLinkTreeDialog();
+                closeMissingLinksDialog();
                 closeMarksDialog();
                 closeHistoryDialog();
                 closeUndoDialog();
@@ -7315,6 +7516,7 @@
 
             window.addEventListener('keydown', handleHistoryKey, { capture: true });
             window.addEventListener('keydown', handleLinksKey, { capture: true });
+            window.addEventListener('keydown', handleMissingLinksKey, { capture: true });
             window.addEventListener('keydown', handleMarksKey, { capture: true });
             window.addEventListener('keydown', handleTagsKey, { capture: true });
             window.addEventListener('keydown', handleUndoKey, { capture: true });
